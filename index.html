@@ -515,7 +515,7 @@ footer span{color:var(--accent);font-weight:600}
         <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Ingresa la cantidad de ganadores y presiona <b style="color:var(--accent)">Sortear</b> una vez por cada ganador. Cada presion revela un nuevo numero manteniendo los anteriores. Usa <b style="color:var(--accent3)">Restablecer</b> para iniciar un sorteo nuevo.</p>
         <div class="rfc">
           <input class="rfi" id="rfc-n" type="number" min="1" max="50" placeholder="Cantidad de ganadores" value="1">
-          <button class="btn btn-primary btn-sm" onclick="doRaffle()"><i class="fas fa-shuffle"></i> Sortear</button>
+          <button class="btn btn-primary btn-sm" id="raffle-btn" onclick="doRaffle()"><i class="fas fa-shuffle"></i> Sortear</button>
         </div>
         <div class="wd" id="adm-winners"></div>
         <button class="btn btn-ghost" style="margin-top:8px" onclick="clearRaffle()"><i class="fas fa-eraser"></i> Restablecer sorteo</button>
@@ -565,19 +565,27 @@ function hashStr(obj) {
 }
 
 async function cloudLoad(silent=false) {
+  if(isSaving) return; // don't overwrite state mid-save
   try {
     const r = await fetch(`${BIN_URL}/latest`, {
       headers: { 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' }
     });
     if(r.ok) {
       const data = await r.json();
-      if(data && typeof data === 'object' && data.trips !== undefined) {
+      if(data && typeof data === 'object' && Array.isArray(data.trips)) {
         const incoming = hashStr(data);
         if(incoming !== lastSavedHash) {
           S = { ...S, ...data };
           lastSavedHash = incoming;
           localStorage.setItem('ec4', JSON.stringify(S));
-          renderPublic(); // update seats in real-time
+          renderPublic();
+          // If admin panel is open, refresh its lists too
+          if(document.getElementById('adm').classList.contains('open')) {
+            renderAdmPass();
+            renderAdmNotify();
+            const at = getActive();
+            if(at) syncRaffleBtn(at);
+          }
         }
       }
     }
@@ -736,14 +744,18 @@ function renderPublic() {
   document.getElementById('s-taken').textContent = taken - paid;
   document.getElementById('s-paid').textContent = paid;
 
-  // winners public
+  // winners public — show ALL winners when raffleOn is enabled
   const wp = document.getElementById('winn-pub');
-  if(active.raffleOn && active.winners && active.winners.length) {
+  const winners = active.winners || [];
+  if(active.raffleOn && winners.length) {
     wp.style.display = 'block';
-    document.getElementById('wp-pills').innerHTML = active.winners.map(w =>
+    document.getElementById('wp-pills').innerHTML = winners.map(w =>
       `<div class="wp-pill"><i class="fas fa-trophy" style="margin-right:4px"></i>Puesto #${w}</div>`
     ).join('');
-  } else wp.style.display = 'none';
+  } else {
+    wp.style.display = 'none';
+    document.getElementById('wp-pills').innerHTML = '';
+  }
 
   // floor tabs
   const ft = document.getElementById('floor-tabs');
@@ -975,6 +987,16 @@ function admTab(tab,btn){
   btn.classList.add('active');
   if(tab==='pasajeros') renderAdmPass();
   if(tab==='avisos') renderAdmNotify();
+  if(tab==='sorteo') {
+    const at = getActive();
+    if(at) {
+      syncRaffleBtn(at);
+      if(at.raffleTarget) document.getElementById('rfc-n').value = at.raffleTarget;
+      document.getElementById('adm-winners').innerHTML = (at.winners||[]).map((w,i) =>
+        `<div class="wp-pill"><i class="fas fa-trophy" style="margin-right:4px"></i>Puesto #${w}</div>`
+      ).join('');
+    }
+  }
 }
 
 // ===== TRIPS ADMIN =====
@@ -1172,57 +1194,69 @@ function massNotify(type){
 }
 
 // ===== RAFFLE =====
-// raffleState tracks: target count, already-revealed winners, pool
-let raffleState = null;
-
 function doRaffle(){
-  const at=getActive(); if(!at){toast('No hay viaje activo','terr');return;}
+  const at = getActive();
+  if(!at){ toast('No hay viaje activo','terr'); return; }
 
-  const target = parseInt(document.getElementById('rfc-n').value)||1;
-
-  // If there are already locked winners, reveal one more
+  // Lock the target on first press and store it in the trip
+  // so subsequent presses use the same target regardless of input changes
+  if(!at.raffleTarget || at.winners.length === 0) {
+    at.raffleTarget = parseInt(document.getElementById('rfc-n').value) || 1;
+  }
+  const target = at.raffleTarget;
   const current = at.winners || [];
 
-  // If we already revealed all requested, block further presses
+  // Fully complete — button does nothing
   if(current.length >= target){
-    toast('Sorteo completo. Restablece para sortear de nuevo.','twarn');
+    toast(`Sorteo completo (${target} ganadores). Presiona Restablecer para nuevo sorteo.`,'twarn');
+    syncRaffleBtn(at);
     return;
   }
 
-  // Build pool: free seats not already drawn
+  // Pool: available seats not taken and not already won
   const free = [];
-  for(let i=1;i<=at.seats;i++){
+  for(let i = 1; i <= at.seats; i++){
     if(!(at.passengers||{})[i] && !current.includes(i)) free.push(i);
   }
-  if(!free.length){toast('No quedan puestos disponibles para sortear','terr');return;}
+  if(!free.length){ toast('No quedan puestos disponibles','terr'); return; }
 
-  // Pick one new winner
-  const idx = Math.floor(Math.random() * free.length);
-  const newWinner = free[idx];
-
+  // Draw one
+  const newWinner = free[Math.floor(Math.random() * free.length)];
   at.winners = [...current, newWinner];
-  save(); renderPublic();
+  save();
+  renderPublic();
+  syncRaffleBtn(at);
 
-  // Show all winners so far in admin panel
   const step = at.winners.length;
-  document.getElementById('adm-winners').innerHTML = at.winners.map((w,i)=>
-    `<div class="wp-pill" style="${i===step-1?'animation:wpulse 0.6s ease-in-out 3':''}">`+
+  document.getElementById('adm-winners').innerHTML = at.winners.map((w, i) =>
+    `<div class="wp-pill"${i === step-1 ? ' style="box-shadow:0 0 18px rgba(245,158,11,0.9)"' : ''}>` +
     `<i class="fas fa-trophy" style="margin-right:4px"></i>Puesto #${w}</div>`
   ).join('');
 
-  toast(`Ganador ${step} de ${target}: Puesto #${newWinner}`,'tinfo');
-
-  // Disable button if all revealed
   if(at.winners.length >= target){
-    toast(`Sorteo completo — ${target} ganador(es) revelados`,'tok');
+    toast(`Sorteo completo — ${target} ganador(es) definidos`,'tok');
+  } else {
+    toast(`Ganador ${step} de ${target}: Puesto #${newWinner}`,'tinfo');
   }
 }
 
+function syncRaffleBtn(at){
+  const btn = document.getElementById('raffle-btn');
+  if(!btn) return;
+  const target = at.raffleTarget || parseInt(document.getElementById('rfc-n').value) || 1;
+  const done = (at.winners||[]).length >= target;
+  btn.disabled = done;
+  btn.style.opacity = done ? '0.4' : '1';
+  btn.style.pointerEvents = done ? 'none' : 'auto';
+}
+
 function clearRaffle(){
-  const at=getActive(); if(!at) return;
-  at.winners=[]; save(); renderPublic();
-  document.getElementById('adm-winners').innerHTML='';
-  raffleState=null;
+  const at = getActive(); if(!at) return;
+  at.winners = [];
+  at.raffleTarget = null;
+  save(); renderPublic();
+  document.getElementById('adm-winners').innerHTML = '';
+  syncRaffleBtn(at);
   toast('Sorteo restablecido');
 }
 
