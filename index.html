@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Excursion Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --c1:#0a1628;--c2:#112240;--c3:#1d3a5f;
+  --accent:#00d4aa;--accent2:#3b82f6;--accent3:#f59e0b;
+  --danger:#ef4444;--success:#10b981;
+  --glass:rgba(255,255,255,0.055);--glass2:rgba(255,255,255,0.09);--gb:rgba(255,255,255,0.11);
+  --text:#e2e8f0;--muted:#7f9bb5;
+  --sf:rgba(0,212,170,0.13);--sfb:rgba(0,212,170,0.45);
+  --st:rgba(239,68,68,0.18);--stb:rgba(239,68,68,0.55);
+  --sp:rgba(16,185,129,0.22);--spb:rgba(16,185,129,0.7);
+  --sw:rgba(245,158,11,0.2);--swb:rgba(245,158,11,0.8);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--c1);color:var(--text);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 15% 15%,rgba(0,212,170,0.07) 0%,transparent 55%),
+             radial-gradient(ellipse at 85% 85%,rgba(59,130,246,0.07) 0%,transparent 55%),
+             linear-gradient(180deg,#0a1628 0%,#091424 100%)}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);z-index:0;pointer-events:none;animation:of 9s ease-in-out infinite}
+.o1{width:380px;height:380px;background:rgba(0,212,170,0.055);top:-80px;left:-80px}
+.o2{width:460px;height:460px;background:rgba(59,130,246,0.05);bottom:-120px;right:-80px;animation-delay:-4.5s}
+@keyframes of{0%,100%{transform:translate(0,0)}50%{transform:translate(25px,18px)}}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+header{background:rgba(9,20,36,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--gb);padding:11px 15px;position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-icon{width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0}
+.logo h1{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:.5px}
+.logo h1 span{color:var(--accent)}
+.hpill{background:var(--glass);border:1px solid var(--gb);border-radius:20px;
+  padding:5px 11px;font-size:11px;color:var(--muted);
+  display:flex;align-items:center;gap:5px;white-space:nowrap}
+.hpill i{color:var(--accent);font-size:10px}
+
+main{flex:1;padding:14px;max-width:500px;margin:0 auto;width:100%}
+
+.upcoming-banner{background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(59,130,246,0.08));
+  border:1px solid rgba(245,158,11,0.28);border-radius:14px;padding:12px 14px;
+  margin-bottom:12px;display:none;position:relative;overflow:hidden}
+.upcoming-banner::after{content:'PROXIMAMENTE';position:absolute;right:-8px;top:10px;
+  font-family:'Syne',sans-serif;font-size:8px;font-weight:800;letter-spacing:2.5px;
+  color:rgba(245,158,11,0.3);transform:rotate(20deg)}
+.ub-tag{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--accent3);
+  margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.ub-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px}
+.ub-meta{display:flex;gap:10px;flex-wrap:wrap}
+.ub-meta span{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.ub-meta i{color:var(--accent2);font-size:10px}
+
+.trip-card{background:var(--glass);border:1px solid var(--gb);border-radius:16px;
+  padding:14px;margin-bottom:14px;backdrop-filter:blur(20px);position:relative;overflow:hidden;display:none}
+.trip-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.tc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}
+.tc-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.tc-dest{color:var(--accent);font-size:12px;margin-top:2px}
+.tc-dest i{margin-right:4px}
+.tc-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:8px;padding:6px 10px;text-align:center;flex-shrink:0}
+.tc-badge .num{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;line-height:1}
+.tc-badge .lbl{font-size:9px;opacity:.85;margin-top:1px}
+.tc-meta{display:flex;gap:10px;flex-wrap:wrap}
+.tc-meta span{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.tc-meta i{color:var(--accent2);font-size:10px}
+
+.srow{display:none;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.sc{background:var(--glass);border:1px solid var(--gb);border-radius:12px;
+  padding:10px;text-align:center;backdrop-filter:blur(15px)}
+.sc-n{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}
+.sc-l{font-size:10px;color:var(--muted);margin-top:1px}
+
+.winner-public{background:linear-gradient(135deg,rgba(245,158,11,0.13),rgba(245,158,11,0.05));
+  border:1px solid rgba(245,158,11,0.38);border-radius:14px;padding:12px 14px;
+  margin-bottom:14px;display:none}
+.wp-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
+  color:var(--accent3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.wp-pills{display:flex;flex-wrap:wrap;gap:6px}
+.wp-pill{background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.6);
+  border-radius:8px;padding:5px 11px;font-family:'Syne',sans-serif;
+  font-size:12px;font-weight:700;color:#f59e0b;animation:wpulse 1.3s ease-in-out infinite alternate}
+@keyframes wpulse{from{box-shadow:0 0 4px rgba(245,158,11,0.25)}to{box-shadow:0 0 14px rgba(245,158,11,0.65)}}
+
+.legend{display:none;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.ld{width:10px;height:10px;border-radius:3px}
+.ldf{background:var(--sf);border:1px solid var(--sfb)}
+.ldt{background:var(--st);border:1px solid var(--stb)}
+.ldp{background:var(--sp);border:1px solid var(--spb)}
+.ldw{background:var(--sw);border:1px solid var(--swb)}
+
+.bus-wrapper{background:var(--glass);border:1px solid var(--gb);border-radius:16px;
+  padding:13px;margin-bottom:14px;backdrop-filter:blur(20px);display:none}
+.bus-lbl{font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.bus-lbl i{color:var(--accent2)}
+.floor-tabs{display:none;gap:6px;margin-bottom:10px}
+.ftab{flex:1;padding:7px;border-radius:9px;font-size:11px;font-weight:600;
+  border:1px solid var(--gb);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.ftab.active{background:linear-gradient(135deg,rgba(0,212,170,0.18),rgba(59,130,246,0.18));
+  border-color:var(--accent);color:var(--text)}
+.bus-grid{display:flex;flex-direction:column;gap:4px;align-items:center}
+.seat-row{display:flex;align-items:center;gap:4px}
+.aisle{width:12px;flex-shrink:0}
+.seat{border-radius:7px;border:1.5px solid var(--sfb);background:var(--sf);
+  cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;overflow:hidden;position:relative;user-select:none}
+.seat:hover:not(.taken):not(.paid):not(.pending){
+  transform:scale(1.1);background:rgba(0,212,170,0.28);
+  border-color:var(--accent);color:var(--text);box-shadow:0 0 10px rgba(0,212,170,0.38)}
+.seat.taken{background:var(--st);border-color:var(--stb);cursor:pointer}
+.seat.paid{background:var(--sp);border-color:var(--spb);cursor:pointer}
+.seat.winner{background:var(--sw);border-color:var(--swb);animation:wpulse 1.3s ease-in-out infinite alternate}
+.seat.pending{background:rgba(59,130,246,0.28);border-color:var(--accent2);cursor:pointer;
+  box-shadow:0 0 8px rgba(59,130,246,0.4)}
+.seat-spacer{flex-shrink:0;visibility:hidden}
+.si{font-size:8px;font-weight:800;line-height:1;text-align:center;max-width:90%;overflow:hidden;white-space:nowrap;color:inherit}
+.sn{font-weight:700;color:var(--muted)}
+
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.72);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{background:linear-gradient(180deg,rgba(22,46,78,0.97),rgba(11,24,48,0.99));
+  border:1px solid var(--gb);border-radius:20px 20px 0 0;width:100%;max-width:500px;
+  padding:18px;transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.4,.64,1);
+  backdrop-filter:blur(30px);max-height:90vh;overflow-y:auto}
+.overlay.open .sheet{transform:translateY(0)}
+.handle{width:38px;height:4px;background:var(--gb);border-radius:2px;margin:0 auto 14px}
+.mt{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:3px}
+.ms{font-size:11px;color:var(--muted);margin-bottom:14px}
+
+.fg{margin-bottom:12px}
+.fl{font-size:10px;color:var(--muted);margin-bottom:4px;display:block;letter-spacing:.5px;text-transform:uppercase}
+.fi{width:100%;background:var(--glass2);border:1px solid var(--gb);border-radius:10px;
+  padding:10px 12px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;
+  outline:none;transition:all .2s;-webkit-appearance:none}
+.fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,170,0.1)}
+.fi::placeholder{color:var(--muted)}
+.prev-row{display:flex;align-items:center;gap:8px;margin-top:7px}
+.pbadge{width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:13px;flex-shrink:0}
+.prev-info{font-size:11px;color:var(--muted);line-height:1.5}
+
+.ssbar{background:var(--glass);border:1px solid var(--gb);border-radius:10px;
+  padding:8px 11px;margin-bottom:12px;display:none;flex-wrap:wrap;gap:5px;align-items:center}
+.ssb-lbl{font-size:10px;color:var(--muted);margin-right:3px;flex-shrink:0}
+.chip{background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(0,212,170,0.15));
+  border:1px solid var(--accent2);border-radius:7px;padding:3px 8px;
+  font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text)}
+.chip i{font-size:9px;color:var(--muted)}
+.chip:hover i{color:var(--danger)}
+.cost-row{background:var(--glass);border:1px solid var(--gb);border-radius:10px;
+  padding:10px 13px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.cost-row .cr-lbl{font-size:12px;color:var(--muted)}
+.cost-row .cr-amt{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--accent3)}
+
+.btn{width:100%;padding:12px;border-radius:11px;border:none;
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;letter-spacing:.3px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+  box-shadow:0 4px 18px rgba(0,212,170,0.25)}
+.btn-primary:active{transform:scale(.98)}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+.btn-ghost{background:var(--glass);border:1px solid var(--gb);color:var(--muted);margin-top:7px}
+.btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff}
+.btn-sm{padding:7px 12px;font-size:11px;border-radius:8px;width:auto;flex-shrink:0}
+.btn-outline{background:transparent;border:1px solid var(--gb);color:var(--muted)}
+
+.sir{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.sidtag{padding:5px 11px;border-radius:7px;
+  background:linear-gradient(135deg,rgba(0,212,170,0.18),rgba(59,130,246,0.18));
+  border:1px solid var(--accent);font-family:'Syne',sans-serif;font-weight:700;font-size:11px}
+.sl{font-size:12px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dp{background:var(--success)}.dw{background:var(--accent3)}.dn{background:var(--accent)}
+
+.toast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-6px);
+  z-index:999;border-radius:11px;padding:8px 15px;font-size:12px;font-weight:600;
+  display:flex;align-items:center;gap:7px;opacity:0;transition:all .3s;
+  white-space:nowrap;pointer-events:none;backdrop-filter:blur(20px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.tok{background:rgba(16,185,129,0.92);color:#fff}
+.terr{background:rgba(239,68,68,0.92);color:#fff}
+.tinfo{background:rgba(59,130,246,0.92);color:#fff}
+.twarn{background:rgba(245,158,11,0.92);color:#fff}
+
+.had{position:fixed;bottom:66px;right:14px;z-index:50;width:32px;height:32px;
+  border-radius:9px;background:rgba(9,20,36,0.5);border:1px solid rgba(255,255,255,0.04);
+  color:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:11px;transition:all .3s}
+.had:hover{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.2);color:rgba(239,68,68,0.45)}
+
+#adm{display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,0.88);backdrop-filter:blur(14px);overflow-y:auto}
+#adm.open{display:block}
+.adm-inner{max-width:500px;margin:0 auto;padding:14px}
+.adm-hdr{background:rgba(9,20,36,0.92);backdrop-filter:blur(20px);border:1px solid var(--gb);
+  border-radius:14px;padding:11px 13px;margin-bottom:12px;display:flex;
+  align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.adm-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;
+  display:flex;align-items:center;gap:7px}
+.adm-title i{color:var(--danger)}
+.asec{background:var(--glass);border:1px solid var(--gb);border-radius:14px;
+  padding:13px;margin-bottom:10px;backdrop-filter:blur(20px)}
+.ast{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.9px;text-transform:uppercase;
+  margin-bottom:11px;display:flex;align-items:center;gap:5px}
+.ast i{color:var(--accent)}
+
+.vg{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:4px}
+.vc{background:var(--glass);border:1.5px solid var(--gb);border-radius:11px;
+  padding:9px;cursor:pointer;transition:all .2s;text-align:center}
+.vc:hover,.vc.sel{border-color:var(--accent);background:rgba(0,212,170,0.08)}
+.vc i{font-size:20px;color:var(--muted);margin-bottom:4px;display:block;transition:.2s}
+.vc.sel i{color:var(--accent)}
+.vc .vn{font-size:11px;font-weight:700;margin-bottom:2px}
+.vc .vs{font-size:10px;color:var(--muted)}
+.sci{background:var(--glass);border:1px solid var(--gb);border-radius:10px;
+  padding:10px 12px;color:var(--text);font-size:20px;font-family:'Syne',sans-serif;
+  font-weight:700;width:100%;text-align:center;outline:none;margin-top:7px;display:none;
+  -webkit-appearance:none}
+
+.tab-bar{display:flex;background:var(--glass);border:1px solid var(--gb);
+  border-radius:12px;padding:3px;gap:3px;margin-bottom:12px}
+.tb{flex:1;padding:7px 3px;border-radius:9px;font-size:10px;font-weight:600;
+  border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:4px}
+.tb.active{background:linear-gradient(135deg,rgba(0,212,170,0.18),rgba(59,130,246,0.18));color:var(--text)}
+.tc{display:none}.tc.active{display:block}
+
+.trip-item{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--glass);border:1px solid var(--gb);border-radius:11px;
+  padding:10px 12px;margin-bottom:7px;transition:.2s}
+.trip-item.active-t{border-color:rgba(0,212,170,0.5);background:rgba(0,212,170,0.05)}
+.ti-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:2px}
+.ti-meta{font-size:10px;color:var(--muted)}
+.ti-acts{display:flex;gap:5px;flex-shrink:0}
+
+.pi{display:flex;align-items:center;gap:9px;background:var(--glass);border:1px solid var(--gb);
+  border-radius:11px;padding:9px;margin-bottom:7px}
+.pav{width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:12px;flex-shrink:0}
+.pin{flex:1;min-width:0}
+.pin-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pin-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.pa{display:flex;gap:5px;flex-shrink:0}
+.pb2{width:30px;height:30px;border-radius:7px;border:1px solid var(--gb);
+  background:var(--glass);color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s}
+.pb2.ok:hover{background:rgba(16,185,129,0.15);color:var(--success);border-color:rgba(16,185,129,0.4)}
+.pb2.wa2:hover{background:rgba(37,211,102,0.15);color:#25d366;border-color:rgba(37,211,102,0.4)}
+.pb2.del:hover{background:rgba(239,68,68,0.15);color:var(--danger);border-color:rgba(239,68,68,0.4)}
+
+.tog-row{display:flex;align-items:center;justify-content:space-between}
+.tog-wrap{position:relative;display:inline-block;width:42px;height:22px;cursor:pointer;flex-shrink:0}
+.tog-wrap input{opacity:0;width:0;height:0;position:absolute}
+.tog-track{position:absolute;inset:0;background:#1e3a5f;border-radius:11px;transition:.3s}
+.tog-knob{position:absolute;height:16px;width:16px;left:3px;bottom:3px;
+  background:white;border-radius:50%;transition:.3s;pointer-events:none}
+
+.rfc{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.rfi{flex:1;background:var(--glass);border:1px solid var(--gb);border-radius:9px;
+  padding:9px 12px;color:var(--text);font-size:14px;outline:none}
+.wd{display:flex;flex-wrap:wrap;gap:7px}
+.mass-row{display:flex;gap:7px;margin-bottom:10px}
+.mass-row .btn{flex:1}
+
+.login-ov{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.92);
+  backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center}
+.login-ov.open{display:flex}
+.lbox{background:linear-gradient(180deg,rgba(22,46,78,0.97),rgba(11,24,48,0.99));
+  border:1px solid var(--gb);border-radius:18px;padding:24px 20px;width:280px}
+.li-icon{width:48px;height:48px;border-radius:13px;
+  background:linear-gradient(135deg,var(--danger),#b91c1c);
+  display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 12px}
+.li-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;text-align:center;margin-bottom:3px}
+.li-sub{font-size:11px;color:var(--muted);text-align:center;margin-bottom:15px}
+
+.notrip{text-align:center;padding:48px 20px;color:var(--muted)}
+.notrip i{font-size:36px;margin-bottom:12px;opacity:.22;display:block}
+.notrip p{font-size:13px}
+.notrip p+p{font-size:11px;margin-top:5px}
+
+footer{text-align:center;padding:14px;font-size:10px;color:var(--muted);
+  border-top:1px solid var(--gb);margin-top:auto}
+footer span{color:var(--accent);font-weight:600}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--gb);border-radius:2px}
+@media(max-width:360px){.seat{border-radius:5px}.aisle{width:8px}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div>
+<div class="app">
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"><i class="fas fa-bus"></i></div>
+    <h1>Excursion<span>Control</span></h1>
+  </div>
+  <div class="hpill"><i class="far fa-calendar"></i><span id="hdate">-</span></div>
+</header>
+
+<main id="main">
+  <div class="upcoming-banner" id="ub">
+    <div class="ub-tag"><i class="fas fa-forward"></i> PROXIMO VIAJE</div>
+    <div class="ub-name" id="ub-name"></div>
+    <div class="ub-meta">
+      <span><i class="fas fa-location-dot"></i><span id="ub-dest"></span></span>
+      <span><i class="far fa-calendar"></i><span id="ub-date"></span></span>
+      <span><i class="fas fa-tag"></i><span id="ub-cost"></span></span>
+    </div>
+  </div>
+
+  <div class="notrip" id="notrip">
+    <i class="fas fa-bus-simple"></i>
+    <p>Sin excursiones activas</p>
+    <p>El administrador no ha configurado ningun viaje todavia.</p>
+  </div>
+
+  <div class="trip-card" id="trip-card">
+    <div class="tc-head">
+      <div>
+        <div class="tc-name" id="tc-name"></div>
+        <div class="tc-dest"><i class="fas fa-location-dot"></i><span id="tc-dest"></span></div>
+      </div>
+      <div class="tc-badge"><div class="num" id="tc-cost"></div><div class="lbl">POR PUESTO</div></div>
+    </div>
+    <div class="tc-meta">
+      <span><i class="far fa-calendar"></i><span id="tc-date"></span></span>
+      <span><i class="fas fa-bus"></i><span id="tc-veh"></span></span>
+      <span><i class="fas fa-chair"></i><span id="tc-seats"></span> puestos</span>
+    </div>
+  </div>
+
+  <div class="srow" id="srow">
+    <div class="sc"><div class="sc-n" style="color:var(--accent)" id="s-free">0</div><div class="sc-l">Disponibles</div></div>
+    <div class="sc"><div class="sc-n" style="color:var(--accent2)" id="s-taken">0</div><div class="sc-l">Apartados</div></div>
+    <div class="sc"><div class="sc-n" style="color:var(--accent3)" id="s-paid">0</div><div class="sc-l">Pagados</div></div>
+  </div>
+
+  <div class="winner-public" id="winn-pub">
+    <div class="wp-title"><i class="fas fa-trophy"></i> Puestos Ganadores del Sorteo</div>
+    <div class="wp-pills" id="wp-pills"></div>
+  </div>
+
+  <div class="legend" id="leg">
+    <div class="li"><div class="ld ldf"></div>Disponible</div>
+    <div class="li"><div class="ld ldt"></div>Apartado</div>
+    <div class="li"><div class="ld ldp"></div>Pagado</div>
+    <div class="li"><div class="ld ldw"></div>Sorteado</div>
+  </div>
+
+  <div class="bus-wrapper" id="bus-wrapper">
+    <div class="bus-lbl"><i class="fas fa-couch"></i> Toca un puesto libre para seleccionarlo &mdash; puedes elegir varios</div>
+    <div class="floor-tabs" id="floor-tabs">
+      <button class="ftab active" onclick="switchFloor(1,this)">Piso 1</button>
+      <button class="ftab" onclick="switchFloor(2,this)">Piso 2</button>
+    </div>
+    <div id="seats-container"></div>
+  </div>
+</main>
+
+<footer>Excursion Control &copy; 2025 &nbsp;&bull;&nbsp; Powered by <span>gabora646</span></footer>
+</div>
+
+<div class="had" onclick="openLogin()"><i class="fas fa-lock"></i></div>
+
+<!-- SEAT MODAL -->
+<div class="overlay" id="ov-seat">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="mt" id="sm-title">Apartar Puesto</div>
+    <div class="ms" id="sm-sub">Completa tus datos</div>
+    <div id="sv-form">
+      <div class="ssbar" id="ssbar"><span class="ssb-lbl">Puestos:</span><div id="ss-chips"></div></div>
+      <div class="fg">
+        <label class="fl">Nombre y Apellido</label>
+        <input class="fi" id="p-name" type="text" placeholder="JUAN PEREZ" oninput="onName(this)">
+        <div class="prev-row">
+          <div class="pbadge" id="name-prev">??</div>
+          <div class="prev-info">Iniciales en el puesto<br><span style="color:var(--accent);font-size:10px">Escribe nombre y apellido</span></div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Numero WhatsApp</label>
+        <input class="fi" id="p-wa" type="tel" placeholder="04228745777" oninput="onWa(this)">
+      </div>
+      <div class="cost-row">
+        <span class="cr-lbl"><i class="fas fa-tag" style="margin-right:5px;color:var(--accent3)"></i>Total a pagar</span>
+        <span class="cr-amt" id="sm-total">-</span>
+      </div>
+      <button class="btn btn-wa" onclick="sendWA()"><i class="fab fa-whatsapp"></i> Confirmar por WhatsApp</button>
+      <button class="btn btn-ghost" id="btn-cancel-seat">Cancelar seleccion</button>
+    </div>
+    <div id="sv-info" style="display:none">
+      <div class="sir"><div class="sidtag" id="si-id"></div><div><div style="font-weight:600;font-size:14px" id="si-name"></div><div style="font-size:11px;color:var(--muted)" id="si-wa"></div></div></div>
+      <div class="sl" id="si-status"></div>
+      <button class="btn btn-ghost" onclick="closeOv('ov-seat')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="login-ov" id="ov-login">
+  <div class="lbox">
+    <div class="li-icon"><i class="fas fa-shield-halved"></i></div>
+    <div class="li-title">Acceso Admin</div>
+    <div class="li-sub">Solo para administradores</div>
+    <div class="fg"><input class="fi" id="apwd" type="password" placeholder="Contrasena" style="text-align:center"></div>
+    <button class="btn btn-danger" onclick="chkLogin()"><i class="fas fa-unlock"></i> Ingresar</button>
+    <button class="btn btn-ghost" onclick="closeOv('ov-login')">Cancelar</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adm">
+  <div class="adm-inner">
+    <div class="adm-hdr">
+      <div class="adm-title"><i class="fas fa-screwdriver-wrench"></i> Panel Administrador</div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('adm').classList.remove('open')" style="width:auto"><i class="fas fa-xmark"></i> Salir</button>
+    </div>
+    <div class="tab-bar">
+      <button class="tb active" onclick="admTab('viajes',this)"><i class="fas fa-route"></i> Viajes</button>
+      <button class="tb" onclick="admTab('pasajeros',this)"><i class="fas fa-users"></i> Pasajeros</button>
+      <button class="tb" onclick="admTab('sorteo',this)"><i class="fas fa-ticket"></i> Sorteo</button>
+      <button class="tb" onclick="admTab('avisos',this)"><i class="fas fa-bell"></i> Avisos</button>
+    </div>
+
+    <!-- VIAJES -->
+    <div class="tc active" id="tc-viajes">
+      <div class="asec">
+        <div class="ast"><i class="fas fa-list"></i> Viajes Configurados</div>
+        <div id="adm-trip-list"></div>
+        <button class="btn btn-outline" style="margin-top:8px" onclick="newTrip()"><i class="fas fa-plus"></i> Nuevo Viaje</button>
+      </div>
+      <div class="asec" id="trip-form-wrap" style="display:none">
+        <div class="ast"><i class="fas fa-pencil"></i> <span id="form-lbl">Nuevo Viaje</span></div>
+        <div style="margin-bottom:10px">
+          <div class="ast" style="margin-bottom:7px"><i class="fas fa-bus"></i> Tipo de Vehiculo</div>
+          <div class="vg">
+            <div class="vc" id="vc-van" onclick="selVeh('van',15,this)"><i class="fas fa-van-shuttle"></i><div class="vn">Van / Econoline</div><div class="vs">15 puestos</div></div>
+            <div class="vc" id="vc-e32" onclick="selVeh('e32',32,this)"><i class="fas fa-bus-simple"></i><div class="vn">Encava ENT 610</div><div class="vs">32 puestos</div></div>
+            <div class="vc" id="vc-e49" onclick="selVeh('e49',49,this)"><i class="fas fa-bus"></i><div class="vn">Encava 6100</div><div class="vs">49 puestos</div></div>
+            <div class="vc" id="vc-e63" onclick="selVeh('e63',63,this)"><i class="fas fa-truck-moving"></i><div class="vn">Encava ENT 3300</div><div class="vs">63 puestos</div></div>
+            <div class="vc" id="vc-dd" onclick="selVeh('dd',70,this)" style="grid-column:1/-1"><i class="fas fa-building"></i><div class="vn">Bus Dos Pisos</div><div class="vs">70 puestos — 2 pisos</div></div>
+            <div class="vc" id="vc-cus" onclick="selVeh('cus',0,this)" style="grid-column:1/-1"><i class="fas fa-sliders"></i><div class="vn">Personalizado</div><div class="vs">Ingresa la cantidad</div></div>
+          </div>
+          <input class="sci" id="cus-n" type="number" min="1" max="200" placeholder="Cantidad de puestos">
+        </div>
+        <div class="fg"><label class="fl">Nombre del Viaje</label><input class="fi" id="f-name" type="text" placeholder="Ej: Excursion Playa El Agua"></div>
+        <div class="fg"><label class="fl">Destino</label><input class="fi" id="f-dest" type="text" placeholder="Ej: Margarita, Venezuela"></div>
+        <div class="fg"><label class="fl">Fecha del Viaje</label><input class="fi" id="f-date" type="date"></div>
+        <div class="fg"><label class="fl">Costo por Puesto</label><input class="fi" id="f-cost" type="text" placeholder="Ej: $50 o Bs. 200.000"></div>
+        <div class="fg">
+          <div class="tog-row">
+            <span style="font-size:13px">Viaje activo (visible al publico)</span>
+            <label class="tog-wrap">
+              <input type="checkbox" id="f-active" checked onchange="syncKnob('f-active','fak')">
+              <div class="tog-track" id="f-active-track"></div>
+              <div class="tog-knob" id="fak"></div>
+            </label>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-primary" onclick="saveTrip()"><i class="fas fa-floppy-disk"></i> Guardar</button>
+          <button class="btn btn-ghost" style="margin-top:0" onclick="cancelForm()">Cancelar</button>
+        </div>
+      </div>
+      <div class="asec" id="raffle-tog-sec" style="display:none">
+        <div class="ast"><i class="fas fa-ticket"></i> Sorteo del Viaje Activo</div>
+        <div class="tog-row">
+          <span style="font-size:13px">Mostrar sorteo al publico</span>
+          <label class="tog-wrap">
+            <input type="checkbox" id="raffle-on" onchange="toggleRaffle()">
+            <div class="tog-track" id="raffle-on-track"></div>
+            <div class="tog-knob" id="raffle-on-knob"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASAJEROS -->
+    <div class="tc" id="tc-pasajeros">
+      <div class="asec">
+        <div class="ast"><i class="fas fa-users"></i> Lista de Pasajeros</div>
+        <div id="adm-plist"></div>
+      </div>
+    </div>
+
+    <!-- SORTEO -->
+    <div class="tc" id="tc-sorteo">
+      <div class="asec">
+        <div class="ast"><i class="fas fa-shuffle"></i> Sortear Puestos</div>
+        <div class="rfc">
+          <input class="rfi" id="rfc-n" type="number" min="1" max="50" placeholder="Cantidad de ganadores" value="1">
+          <button class="btn btn-primary btn-sm" onclick="doRaffle()"><i class="fas fa-shuffle"></i> Sortear</button>
+        </div>
+        <div class="wd" id="adm-winners"></div>
+        <button class="btn btn-ghost" style="margin-top:8px" onclick="clearRaffle()"><i class="fas fa-eraser"></i> Limpiar sorteo</button>
+      </div>
+    </div>
+
+    <!-- AVISOS -->
+    <div class="tc" id="tc-avisos">
+      <div class="asec">
+        <div class="ast"><i class="fas fa-bullhorn"></i> Envio Masivo</div>
+        <div class="mass-row">
+          <button class="btn btn-wa btn-sm" onclick="massNotify('reminder')"><i class="fab fa-whatsapp"></i> Recordatorio a todos</button>
+          <button class="btn btn-primary btn-sm" onclick="massNotify('paid')"><i class="fas fa-check-circle"></i> Confirmar todos</button>
+        </div>
+      </div>
+      <div class="asec">
+        <div class="ast"><i class="fas fa-user-check"></i> Notificacion Individual</div>
+        <div id="adm-notify-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+const ADMIN_WA = '584228745777';
+let S = { pwd:'1234', trips:[] };
+let fEditId = null, fVeh = null, fSeats = 0;
+let pending = [];   // seat numbers selected but not yet sent
+let curFloor = 1;
+
+// ===== PERSIST =====
+const load = () => { try { const d = localStorage.getItem('ec4'); if(d) S = {...S,...JSON.parse(d)}; } catch(e){} };
+const save = () => localStorage.setItem('ec4', JSON.stringify(S));
+
+// ===== BOOT =====
+window.onload = () => {
+  load();
+  syncKnob('f-active','fak');
+  document.getElementById('f-active').addEventListener('change', () => syncKnob('f-active','fak'));
+  document.getElementById('raffle-on').addEventListener('change', () => syncKnob('raffle-on','raffle-on-knob'));
+  document.getElementById('apwd').addEventListener('keydown', e => { if(e.key==='Enter') chkLogin(); });
+  document.getElementById('btn-cancel-seat').addEventListener('click', cancelSeat);
+  renderPublic();
+};
+
+function syncKnob(inpId, knobId) {
+  const on = document.getElementById(inpId).checked;
+  const knob = document.getElementById(knobId);
+  const track = document.getElementById(inpId + '-track') || document.getElementById(knobId.replace('-knob','-track'));
+  if(knob) knob.style.transform = on ? 'translateX(20px)' : '';
+  // track color via parent label's sibling
+  const inp = document.getElementById(inpId);
+  const tr = inp.nextElementSibling;
+  if(tr && tr.classList.contains('tog-track')) tr.style.background = on ? 'var(--accent)' : '';
+}
+
+// ===== HELPERS =====
+const getActive = () => S.trips.find(t => t.active) || null;
+const getUpcoming = () => {
+  const today = new Date().toISOString().slice(0,10);
+  return S.trips.filter(t => !t.active && t.date >= today).sort((a,b)=>a.date.localeCompare(b.date))[0]||null;
+};
+
+function fmtDate(d) {
+  if(!d) return '-';
+  const [y,m,day] = d.split('-');
+  return `${day} ${['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][+m-1]} ${y}`;
+}
+const vehLbl = v => ({van:'Van/Econoline',e32:'Encava ENT 610',e49:'Encava 6100',e63:'Encava ENT 3300',dd:'Bus 2 Pisos',cus:'Personalizado'}[v]||v);
+const genId = (trip,n) => {
+  const p = (trip.name||'EXC').replace(/[^a-zA-Z]/g,'').substring(0,3).toUpperCase()||'EXC';
+  const d = (trip.date||'').replace(/-/g,'').substring(2);
+  return `${p}-${d}-${String(n).padStart(3,'0')}`;
+};
+const daysLeft = d => {
+  if(!d) return '?';
+  const t=new Date(); t.setHours(0,0,0,0);
+  const trip=new Date(d+'T00:00:00');
+  return Math.max(0,Math.ceil((trip-t)/86400000));
+};
+function normWa(raw) {
+  let v = raw.replace(/\D/g,'');
+  if(v.startsWith('58')) return '+'+v;
+  if(v.startsWith('0')) return '+58'+v.substring(1);
+  return '+58'+v;
+}
+function getInitials(name) {
+  const p = name.trim().split(/\s+/).filter(Boolean);
+  if(p.length>=2) return (p[0][0]+p[p.length-1][0]).toUpperCase();
+  if(p.length===1&&p[0].length>=2) return p[0].substring(0,2).toUpperCase();
+  return ((p[0]||'?')[0]||'?').toUpperCase()+'?';
+}
+function calcTotal(trip) {
+  const numStr = (trip.cost||'').replace(/[^\d.,]/g,'').replace(',','.');
+  const n = parseFloat(numStr);
+  if(isNaN(n)||!pending.length) return trip.cost+(pending.length>1?` x${pending.length}`:'');
+  const sym = (trip.cost||'').replace(/[\d.,\s]/g,'').trim();
+  return sym+(n*pending.length).toLocaleString('es-VE');
+}
+
+// ===== PUBLIC RENDER =====
+function renderPublic() {
+  const active = getActive();
+  const upcoming = getUpcoming();
+
+  // upcoming banner
+  const uEl = document.getElementById('ub');
+  if(upcoming) {
+    uEl.style.display = 'block';
+    document.getElementById('ub-name').textContent = upcoming.name;
+    document.getElementById('ub-dest').textContent = upcoming.dest;
+    document.getElementById('ub-date').textContent = fmtDate(upcoming.date);
+    document.getElementById('ub-cost').textContent = upcoming.cost;
+  } else uEl.style.display = 'none';
+
+  const notrip = document.getElementById('notrip');
+  const card = document.getElementById('trip-card');
+  const srow = document.getElementById('srow');
+  const leg = document.getElementById('leg');
+  const bw = document.getElementById('bus-wrapper');
+
+  if(!active) {
+    notrip.style.display = 'block'; card.style.display = 'none';
+    srow.style.display = 'none'; leg.style.display = 'none';
+    bw.style.display = 'none';
+    document.getElementById('winn-pub').style.display = 'none';
+    document.getElementById('hdate').textContent = '-';
+    return;
+  }
+
+  notrip.style.display = 'none'; card.style.display = 'block';
+  srow.style.display = 'grid'; leg.style.display = 'flex';
+  bw.style.display = 'block';
+
+  document.getElementById('tc-name').textContent = active.name;
+  document.getElementById('tc-dest').textContent = active.dest;
+  document.getElementById('tc-date').textContent = fmtDate(active.date);
+  document.getElementById('tc-veh').textContent = vehLbl(active.veh);
+  document.getElementById('tc-seats').textContent = active.seats;
+  document.getElementById('tc-cost').textContent = active.cost;
+  document.getElementById('hdate').textContent = fmtDate(active.date);
+
+  // stats
+  const total = active.seats;
+  const pass = active.passengers||{};
+  const taken = Object.keys(pass).length;
+  const paid = Object.values(pass).filter(p=>p.paid).length;
+  document.getElementById('s-free').textContent = total - taken;
+  document.getElementById('s-taken').textContent = taken - paid;
+  document.getElementById('s-paid').textContent = paid;
+
+  // winners public
+  const wp = document.getElementById('winn-pub');
+  if(active.raffleOn && active.winners && active.winners.length) {
+    wp.style.display = 'block';
+    document.getElementById('wp-pills').innerHTML = active.winners.map(w =>
+      `<div class="wp-pill"><i class="fas fa-trophy" style="margin-right:4px"></i>Puesto #${w}</div>`
+    ).join('');
+  } else wp.style.display = 'none';
+
+  // floor tabs
+  const ft = document.getElementById('floor-tabs');
+  ft.style.display = active.doubleDeck ? 'flex' : 'none';
+
+  renderSeats(active);
+}
+
+// ===== SEATS =====
+function renderSeats(trip) {
+  const c = document.getElementById('seats-container');
+  c.innerHTML = '';
+  const total = trip.seats;
+  let start, count;
+  if(trip.doubleDeck) {
+    const half = Math.ceil(total/2);
+    if(curFloor===1){start=1;count=half;}
+    else{start=half+1;count=total-half;}
+  } else { start=1; count=total; }
+
+  const isVan = trip.veh==='van';
+  const cols = isVan ? 3 : 4;
+  const leftC = Math.floor(cols/2);
+
+  // Compute size
+  const availW = Math.min(window.innerWidth, 500) - 28;
+  const aisleW = 12;
+  const gapW = 4 * (cols-1) + aisleW;
+  const sz = Math.min(Math.floor((availW - gapW) / cols), 42);
+
+  const grid = document.createElement('div');
+  grid.className = 'bus-grid';
+
+  const rows = Math.ceil(count/cols);
+  let sn = start;
+  for(let r=0;r<rows;r++){
+    const row = document.createElement('div');
+    row.className = 'seat-row';
+    for(let col=0;col<cols;col++){
+      if(col===leftC){
+        const a=document.createElement('div');
+        a.className='aisle';a.style.width=aisleW+'px';row.appendChild(a);
+      }
+      if(sn>start+count-1){
+        const sp=document.createElement('div');
+        sp.className='seat seat-spacer';
+        sp.style.cssText=`width:${sz}px;height:${sz}px`;
+        row.appendChild(sp);
+      } else {
+        row.appendChild(mkSeat(trip,sn,sz));
+        sn++;
+      }
+    }
+    grid.appendChild(row);
+  }
+  c.appendChild(grid);
+}
+
+function mkSeat(trip, num, sz) {
+  const el = document.createElement('div');
+  el.className = 'seat';
+  el.style.cssText = `width:${sz}px;height:${sz}px;font-size:${Math.floor(sz*0.22)}px`;
+  el.id = 'seat-'+num;
+
+  const info = (trip.passengers||{})[num];
+  const isWinner = (trip.winners||[]).includes(num);
+  const isPend = pending.includes(num);
+
+  if(isPend) {
+    el.classList.add('pending');
+    const prev = document.getElementById('name-prev');
+    const initials = prev ? prev.textContent : '?';
+    el.innerHTML = `<span class="si" style="color:#fff">${initials==='??'?'?':initials}</span>`;
+  } else if(info && info.paid) {
+    el.classList.add('paid');
+    el.innerHTML = `<span class="si" style="color:var(--text)">${info.initials}</span>`;
+  } else if(info) {
+    el.classList.add('taken');
+    el.innerHTML = `<span class="si" style="color:var(--stb)">${info.initials}</span>`;
+  } else {
+    el.innerHTML = `<span class="sn" style="font-size:${Math.floor(sz*0.22)}px">${num}</span>`;
+  }
+
+  if(isWinner && !isPend && !info) el.classList.add('winner');
+  el.onclick = () => onSeatClick(trip, num, info, isPend);
+  return el;
+}
+
+function onSeatClick(trip, num, info, isPend) {
+  if(isPend) {
+    pending = pending.filter(s=>s!==num);
+    renderSeats(trip);
+    updateChips(trip);
+    if(pending.length===0 && document.getElementById('ov-seat').classList.contains('open'))
+      closeOv('ov-seat');
+    return;
+  }
+  if(info) {
+    // Show info sheet
+    document.getElementById('sv-form').style.display='none';
+    document.getElementById('sv-info').style.display='block';
+    document.getElementById('sm-title').textContent='Puesto #'+num;
+    document.getElementById('sm-sub').textContent='ID: '+genId(trip,num);
+    document.getElementById('si-id').textContent=genId(trip,num);
+    document.getElementById('si-name').textContent=info.name;
+    document.getElementById('si-wa').textContent=info.wa;
+    document.getElementById('si-status').innerHTML=`<span class="dot ${info.paid?'dp':'dw'}"></span>${info.paid?'Pago confirmado por el administrador':'En espera de confirmacion de pago'}`;
+    openOv('ov-seat');
+    return;
+  }
+  // Free seat
+  pending.push(num);
+  pending.sort((a,b)=>a-b);
+  renderSeats(trip);
+  openFormSheet(trip);
+}
+
+function openFormSheet(trip) {
+  document.getElementById('sv-form').style.display='block';
+  document.getElementById('sv-info').style.display='none';
+  updateChips(trip);
+  openOv('ov-seat');
+}
+
+function updateChips(trip) {
+  const bar = document.getElementById('ssbar');
+  if(!pending.length){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  document.getElementById('ss-chips').innerHTML = pending.map(s=>
+    `<div class="chip" onclick="removePend(${s})"><span>#${s}</span><i class="fas fa-xmark"></i></div>`
+  ).join('');
+  const t = trip||getActive();
+  const multi = pending.length>1;
+  document.getElementById('sm-title').textContent = multi?`${pending.length} Puestos Seleccionados`:`Puesto #${pending[0]}`;
+  document.getElementById('sm-sub').textContent = multi?'Toca mas puestos en el mapa para agregar':'ID: '+genId(t,pending[0]);
+  if(t) document.getElementById('sm-total').textContent = calcTotal(t);
+}
+
+function removePend(num) {
+  pending = pending.filter(s=>s!==num);
+  const trip = getActive();
+  if(trip) renderSeats(trip);
+  updateChips(trip);
+  if(pending.length===0) closeOv('ov-seat');
+}
+
+function cancelSeat() {
+  pending = [];
+  const trip = getActive();
+  if(trip) renderSeats(trip);
+  closeOv('ov-seat');
+}
+
+// ===== FORM INPUTS =====
+function onName(el) {
+  el.value = el.value.toUpperCase();
+  const init = getInitials(el.value);
+  document.getElementById('name-prev').textContent = init;
+  const trip = getActive();
+  if(trip && pending.length) renderSeats(trip);
+}
+
+function onWa(el) {
+  let v = el.value.replace(/\D/g,'');
+  if(v.startsWith('58')) { el.value='+'+v; return; }
+  if(v.startsWith('0')) { el.value='+58'+v.substring(1); return; }
+  if(v.length) el.value='+58'+v;
+}
+
+// ===== SEND WA =====
+function sendWA() {
+  const name = document.getElementById('p-name').value.trim();
+  const wa = document.getElementById('p-wa').value.trim();
+  if(!name || name.trim().split(/\s+/).filter(Boolean).length < 2) { toast('Ingresa nombre Y apellido completos','terr'); return; }
+  if(!wa || wa.replace(/\D/g,'').length < 10) { toast('Numero de WhatsApp invalido','terr'); return; }
+  const trip = getActive(); if(!trip) return;
+  const initials = getInitials(name);
+  const waClean = normWa(wa);
+  if(!trip.passengers) trip.passengers={};
+  pending.forEach(s=>{ trip.passengers[s]={name:name.toUpperCase(),wa:waClean,initials,paid:false}; });
+  save();
+  const seats = pending.map(s=>`#${s}`).join(', ');
+  const ids = pending.map(s=>genId(trip,s)).join(', ');
+  const total = calcTotal(trip);
+  const msg = `Hola, quiero apartar ${pending.length} puesto(s) para la excursion *${trip.name}* a ${trip.dest} el ${fmtDate(trip.date)}.\n\nPuestos: ${seats}\nID(s): ${ids}\nTotal: ${total}\n\nNombre: ${name.toUpperCase()}\nWhatsApp: ${waClean}\n\nEspero confirmacion. Gracias.`;
+  window.open(`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`,'_blank');
+  pending=[];
+  closeOv('ov-seat');
+  renderPublic();
+  toast('Redirigiendo a WhatsApp...','tinfo');
+}
+
+// ===== FLOOR =====
+function switchFloor(f,btn) {
+  curFloor=f;
+  document.querySelectorAll('.ftab').forEach((t,i)=>t.classList.toggle('active',i+1===f));
+  const trip=getActive(); if(trip) renderSeats(trip);
+}
+
+// ===== OVERLAYS =====
+const openOv = id => document.getElementById(id).classList.add('open');
+const closeOv = id => document.getElementById(id).classList.remove('open');
+document.getElementById('ov-seat').addEventListener('click',function(e){if(e.target===this) closeOv('ov-seat');});
+document.getElementById('ov-login').addEventListener('click',function(e){if(e.target===this) closeOv('ov-login');});
+
+// ===== ADMIN AUTH =====
+function openLogin(){ document.getElementById('apwd').value=''; openOv('ov-login'); }
+function chkLogin(){
+  if(document.getElementById('apwd').value===S.pwd){
+    closeOv('ov-login'); openAdm();
+  } else toast('Contrasena incorrecta','terr');
+}
+function openAdm(){
+  document.getElementById('adm').classList.add('open');
+  renderAdmTrips(); renderAdmPass(); renderAdmNotify();
+  const at=getActive();
+  if(at){
+    document.getElementById('raffle-on').checked=!!at.raffleOn;
+    syncKnob('raffle-on','raffle-on-knob');
+    document.getElementById('raffle-tog-sec').style.display='block';
+  } else document.getElementById('raffle-tog-sec').style.display='none';
+}
+
+// ===== ADMIN TABS =====
+function admTab(tab,btn){
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tc-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(tab==='pasajeros') renderAdmPass();
+  if(tab==='avisos') renderAdmNotify();
+}
+
+// ===== TRIPS ADMIN =====
+function renderAdmTrips(){
+  const el = document.getElementById('adm-trip-list');
+  if(!S.trips.length){ el.innerHTML='<p style="font-size:11px;color:var(--muted);text-align:center;padding:14px">Sin viajes creados.</p>'; return; }
+  el.innerHTML = S.trips.map(t=>`
+    <div class="trip-item ${t.active?'active-t':''}">
+      <div>
+        <div class="ti-name">${t.name}</div>
+        <div class="ti-meta">
+          ${t.active?`<span style="color:var(--accent)"><i class="fas fa-circle" style="font-size:7px"></i> Activo &bull; </span>`:`<span style="color:var(--muted)"><i class="fas fa-circle" style="font-size:7px"></i> Inactivo &bull; </span>`}
+          ${fmtDate(t.date)} &bull; ${t.dest}
+        </div>
+      </div>
+      <div class="ti-acts">
+        ${!t.active?`<button class="btn btn-primary btn-sm" onclick="setActive('${t.id}')"><i class="fas fa-play"></i></button>`:''}
+        <button class="btn btn-ghost btn-sm" style="margin-top:0" onclick="editTrip('${t.id}')"><i class="fas fa-pencil"></i></button>
+        <button class="btn btn-ghost btn-sm" style="margin-top:0;color:var(--danger)" onclick="delTrip('${t.id}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function newTrip(){
+  fEditId=null; fVeh=null; fSeats=0;
+  document.querySelectorAll('.vc').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('cus-n').style.display='none'; document.getElementById('cus-n').value='';
+  document.getElementById('f-name').value=''; document.getElementById('f-dest').value='';
+  document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('f-cost').value='';
+  document.getElementById('f-active').checked=true; syncKnob('f-active','fak');
+  document.getElementById('form-lbl').textContent='Nuevo Viaje';
+  document.getElementById('trip-form-wrap').style.display='block';
+}
+
+function editTrip(id){
+  const t=S.trips.find(x=>x.id===id); if(!t) return;
+  fEditId=id; fVeh=t.veh; fSeats=t.seats;
+  document.querySelectorAll('.vc').forEach(c=>c.classList.remove('sel'));
+  const vc=document.getElementById('vc-'+t.veh); if(vc) vc.classList.add('sel');
+  document.getElementById('cus-n').style.display=t.veh==='cus'?'block':'none';
+  document.getElementById('cus-n').value=t.veh==='cus'?t.seats:'';
+  document.getElementById('f-name').value=t.name; document.getElementById('f-dest').value=t.dest;
+  document.getElementById('f-date').value=t.date; document.getElementById('f-cost').value=t.cost;
+  document.getElementById('f-active').checked=!!t.active; syncKnob('f-active','fak');
+  document.getElementById('form-lbl').textContent='Editar Viaje';
+  document.getElementById('trip-form-wrap').style.display='block';
+}
+
+function cancelForm(){ document.getElementById('trip-form-wrap').style.display='none'; fEditId=null; }
+
+function saveTrip(){
+  const name=document.getElementById('f-name').value.trim();
+  const dest=document.getElementById('f-dest').value.trim();
+  const date=document.getElementById('f-date').value;
+  const cost=document.getElementById('f-cost').value.trim();
+  const active=document.getElementById('f-active').checked;
+  if(!name||!dest||!date||!cost){toast('Completa todos los campos del viaje','terr');return;}
+  if(!fVeh){toast('Selecciona un tipo de vehiculo','terr');return;}
+  if(fVeh==='cus'){
+    fSeats=parseInt(document.getElementById('cus-n').value)||0;
+    if(fSeats<1){toast('Ingresa la cantidad de puestos','terr');return;}
+  }
+  if(active) S.trips.forEach(t=>t.active=false);
+  if(fEditId){
+    const t=S.trips.find(x=>x.id===fEditId);
+    if(t){Object.assign(t,{name,dest,date,cost,active,veh:fVeh,seats:fSeats,doubleDeck:fVeh==='dd'});}
+  } else {
+    S.trips.push({id:'T'+Date.now(),name,dest,date,cost,active,veh:fVeh,seats:fSeats,
+      doubleDeck:fVeh==='dd',passengers:{},winners:[],raffleOn:false});
+  }
+  save(); cancelForm(); renderAdmTrips(); renderPublic();
+  const at=getActive();
+  if(at){
+    document.getElementById('raffle-on').checked=!!at.raffleOn;
+    syncKnob('raffle-on','raffle-on-knob');
+    document.getElementById('raffle-tog-sec').style.display='block';
+  }
+  toast('Viaje guardado');
+}
+
+function setActive(id){
+  S.trips.forEach(t=>t.active=t.id===id);
+  save(); renderAdmTrips(); renderPublic();
+  const at=getActive();
+  if(at){document.getElementById('raffle-on').checked=!!at.raffleOn;syncKnob('raffle-on','raffle-on-knob');document.getElementById('raffle-tog-sec').style.display='block';}
+  toast('Viaje activado');
+}
+
+function delTrip(id){
+  if(!confirm('Eliminar este viaje y todos sus datos?')) return;
+  S.trips=S.trips.filter(t=>t.id!==id);
+  save(); renderAdmTrips(); renderPublic();
+  toast('Viaje eliminado','twarn');
+}
+
+function selVeh(veh,seats,el){
+  document.querySelectorAll('.vc').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); fVeh=veh; fSeats=seats;
+  const ci=document.getElementById('cus-n');
+  ci.style.display=veh==='cus'?'block':'none';
+  if(veh==='cus'){ci.focus();fSeats=0;}
+}
+document.getElementById('cus-n').addEventListener('input',function(){fSeats=parseInt(this.value)||0;});
+
+function toggleRaffle(){
+  const at=getActive(); if(!at) return;
+  at.raffleOn=document.getElementById('raffle-on').checked;
+  syncKnob('raffle-on','raffle-on-knob');
+  save(); renderPublic();
+  toast(at.raffleOn?'Sorteo visible al publico':'Sorteo ocultado del publico');
+}
+
+// ===== PASSENGERS ADMIN =====
+function renderAdmPass(){
+  const el=document.getElementById('adm-plist');
+  const at=getActive();
+  const entries=at?Object.entries(at.passengers||{}).sort((a,b)=>+a[0]-+b[0]):[];
+  if(!entries.length){el.innerHTML='<p style="font-size:11px;color:var(--muted);text-align:center;padding:16px">Sin pasajeros registrados.</p>';return;}
+  el.innerHTML=entries.map(([sn,p])=>`
+    <div class="pi">
+      <div class="pav">${p.initials}</div>
+      <div class="pin">
+        <div class="pin-name">${p.name}</div>
+        <div class="pin-meta"><span class="dot ${p.paid?'dp':'dw'}" style="margin-right:4px"></span>Puesto #${sn} &bull; ${genId(at,+sn)}</div>
+        <div class="pin-meta">${p.wa}</div>
+      </div>
+      <div class="pa">
+        ${!p.paid?`<button class="pb2 ok" onclick="confirmPay(${sn})" title="Confirmar pago"><i class="fas fa-check"></i></button>`:`<button class="pb2" style="color:var(--success)" title="Pagado"><i class="fas fa-circle-check"></i></button>`}
+        <button class="pb2 wa2" onclick="notifyOne(${sn},'confirm')" title="Notificar por WA"><i class="fab fa-whatsapp"></i></button>
+        <button class="pb2 del" onclick="freeSeat(${sn})" title="Liberar puesto"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAdmNotify(){
+  const el=document.getElementById('adm-notify-list');
+  const at=getActive();
+  const entries=at?Object.entries(at.passengers||{}).sort((a,b)=>+a[0]-+b[0]):[];
+  if(!entries.length){el.innerHTML='<p style="font-size:11px;color:var(--muted);text-align:center;padding:16px">Sin pasajeros.</p>';return;}
+  el.innerHTML=entries.map(([sn,p])=>`
+    <div class="pi">
+      <div class="pav">${p.initials}</div>
+      <div class="pin">
+        <div class="pin-name">${p.name}</div>
+        <div class="pin-meta">Puesto #${sn} &bull; ${p.paid?'Pagado':'Pendiente'}</div>
+      </div>
+      <div class="pa">
+        <button class="pb2 wa2" onclick="notifyOne(${sn},'reminder')" title="Recordatorio"><i class="fas fa-bell"></i></button>
+        <button class="pb2 wa2" onclick="notifyOne(${sn},'confirm')" title="Confirmar pago"><i class="fas fa-check-circle"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function confirmPay(sn){
+  const at=getActive(); if(!at||!at.passengers[sn]) return;
+  at.passengers[sn].paid=true; save(); renderPublic(); renderAdmPass(); renderAdmNotify();
+  toast('Pago del Puesto #'+sn+' confirmado');
+}
+
+function freeSeat(sn){
+  const at=getActive(); if(!at) return;
+  delete at.passengers[sn]; save(); renderPublic(); renderAdmPass(); renderAdmNotify();
+  toast('Puesto #'+sn+' liberado','twarn');
+}
+
+function notifyOne(sn,type){
+  const at=getActive(); if(!at) return;
+  const p=at.passengers[sn]; if(!p) return;
+  const days=daysLeft(at.date);
+  const wa=p.wa.replace(/\D/g,'');
+  const firstName=p.name.split(' ')[0];
+  let msg;
+  if(type==='confirm')
+    msg=`Hola ${firstName}, tu pago por el Puesto #${sn} (${genId(at,+sn)}) para *${at.name}* rumbo a ${at.dest} ha sido CONFIRMADO. Nos vemos el ${fmtDate(at.date)}. Gracias por preferirnos.`;
+  else
+    msg=`Hola ${firstName}, te recordamos que faltan *${days} dias* para la excursion *${at.name}* a ${at.dest} el ${fmtDate(at.date)}. Tu puesto es el #${sn}. Cualquier duda, aqui estamos.`;
+  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function massNotify(type){
+  const at=getActive(); if(!at) return;
+  const entries=Object.entries(at.passengers||{});
+  if(!entries.length){toast('No hay pasajeros registrados','twarn');return;}
+  if(type==='paid'){
+    entries.forEach(([sn])=>{at.passengers[sn].paid=true;});
+    save(); renderPublic(); renderAdmPass(); toast(`${entries.length} pagos confirmados`);
+  } else {
+    entries.forEach(([sn],i)=>setTimeout(()=>notifyOne(+sn,'reminder'),i*600));
+    toast(`Enviando recordatorio a ${entries.length} pasajeros...`,'tinfo');
+  }
+}
+
+// ===== RAFFLE =====
+function doRaffle(){
+  const at=getActive(); if(!at){toast('No hay viaje activo','terr');return;}
+  const n=parseInt(document.getElementById('rfc-n').value)||1;
+  const free=[];
+  for(let i=1;i<=at.seats;i++) if(!(at.passengers||{})[i]) free.push(i);
+  if(!free.length){toast('No hay puestos disponibles para sortear','terr');return;}
+  const actual=Math.min(n,free.length);
+  const pool=[...free]; const winners=[];
+  for(let i=0;i<actual;i++){const idx=Math.floor(Math.random()*pool.length);winners.push(pool.splice(idx,1)[0]);}
+  at.winners=winners; save(); renderPublic();
+  document.getElementById('adm-winners').innerHTML=winners.map(w=>
+    `<div class="wp-pill"><i class="fas fa-trophy" style="margin-right:4px"></i>Puesto #${w}</div>`
+  ).join('');
+  toast(`${winners.length} ganador(es) sorteados`,'tinfo');
+}
+
+function clearRaffle(){
+  const at=getActive(); if(!at) return;
+  at.winners=[]; save(); renderPublic();
+  document.getElementById('adm-winners').innerHTML='';
+  toast('Sorteo limpiado');
+}
+
+// ===== TOAST =====
+function toast(msg,cls='tok'){
+  const t=document.getElementById('toast');
+  const ic={tok:'circle-check',terr:'circle-xmark',twarn:'triangle-exclamation',tinfo:'circle-info'};
+  t.innerHTML=`<i class="fas fa-${ic[cls]||'circle-check'}"></i> ${msg}`;
+  t.className=`toast show ${cls}`;
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.className='toast',3000);
+}
+</script>
+</body>
+</html>
