@@ -512,12 +512,13 @@ footer span{color:var(--accent);font-weight:600}
     <div class="tc" id="tc-sorteo">
       <div class="asec">
         <div class="ast"><i class="fas fa-shuffle"></i> Sortear Puestos</div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Ingresa la cantidad de ganadores y presiona <b style="color:var(--accent)">Sortear</b> una vez por cada ganador. Cada presion revela un nuevo numero manteniendo los anteriores. Usa <b style="color:var(--accent3)">Restablecer</b> para iniciar un sorteo nuevo.</p>
         <div class="rfc">
           <input class="rfi" id="rfc-n" type="number" min="1" max="50" placeholder="Cantidad de ganadores" value="1">
           <button class="btn btn-primary btn-sm" onclick="doRaffle()"><i class="fas fa-shuffle"></i> Sortear</button>
         </div>
         <div class="wd" id="adm-winners"></div>
-        <button class="btn btn-ghost" style="margin-top:8px" onclick="clearRaffle()"><i class="fas fa-eraser"></i> Limpiar sorteo</button>
+        <button class="btn btn-ghost" style="margin-top:8px" onclick="clearRaffle()"><i class="fas fa-eraser"></i> Restablecer sorteo</button>
       </div>
     </div>
 
@@ -548,14 +549,22 @@ let fEditId = null, fVeh = null, fSeats = 0;
 let pending = [];   // seat numbers selected but not yet sent
 let curFloor = 1;
 
-// ===== JSONBIN CLOUD SYNC =====
+// ===== JSONBIN CLOUD SYNC (REAL-TIME) =====
 const BIN_ID  = '69eabd16856a68218967ae94';
 const BIN_KEY = '$2a$10$BHNFFV8jxDgvi0gw16Wc7OjedzrlCHMo5hAh2z9e.SV5uFUaUB2uW';
 const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-let saveTimer = null;
-let isSaving  = false;
+let isSaving = false;
+let pollTimer = null;
+let lastSavedHash = '';
 
-async function cloudLoad() {
+function hashStr(obj) {
+  const s = JSON.stringify(obj);
+  let h = 0;
+  for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0;}
+  return h.toString();
+}
+
+async function cloudLoad(silent=false) {
   try {
     const r = await fetch(`${BIN_URL}/latest`, {
       headers: { 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' }
@@ -563,52 +572,62 @@ async function cloudLoad() {
     if(r.ok) {
       const data = await r.json();
       if(data && typeof data === 'object' && data.trips !== undefined) {
-        S = { ...S, ...data };
-        localStorage.setItem('ec4', JSON.stringify(S));
+        const incoming = hashStr(data);
+        if(incoming !== lastSavedHash) {
+          S = { ...S, ...data };
+          lastSavedHash = incoming;
+          localStorage.setItem('ec4', JSON.stringify(S));
+          renderPublic(); // update seats in real-time
+        }
       }
     }
-  } catch(e) {
-    // offline fallback — use localStorage
-    try { const d = localStorage.getItem('ec4'); if(d) S = {...S,...JSON.parse(d)}; } catch(_){}
-  }
+  } catch(e) { /* offline — stay with local */ }
 }
 
 async function cloudSave() {
-  localStorage.setItem('ec4', JSON.stringify(S)); // always cache locally
   if(isSaving) return;
   isSaving = true;
   try {
+    const body = JSON.stringify(S);
     await fetch(BIN_URL, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': BIN_KEY
-      },
-      body: JSON.stringify(S)
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
+      body
     });
-  } catch(e) { /* silent fail — data is still in localStorage */ }
+    lastSavedHash = hashStr(S);
+  } catch(e) { /* silent fail */ }
   isSaving = false;
 }
 
-// Debounced save: waits 800ms after last change before pushing to cloud
+// Instant save: write to localStorage immediately, push to cloud right away
 function save() {
   localStorage.setItem('ec4', JSON.stringify(S));
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(cloudSave, 800);
+  lastSavedHash = hashStr(S); // prevent poll from re-rendering our own change
+  cloudSave();
+}
+
+// Poll every 5 seconds for changes from other devices/sessions
+function startPolling() {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(() => cloudLoad(true), 5000);
 }
 
 // ===== BOOT =====
 window.onload = async () => {
-  // Load local first for instant render, then sync from cloud
-  try { const d = localStorage.getItem('ec4'); if(d) S = {...S,...JSON.parse(d)}; } catch(e){}
+  // 1. Load from localStorage instantly — no loading screen
+  try { const d = localStorage.getItem('ec4'); if(d) { S = {...S,...JSON.parse(d)}; lastSavedHash = hashStr(S); } } catch(e){}
   syncKnob('f-active','fak');
   document.getElementById('f-active').addEventListener('change', () => syncKnob('f-active','fak'));
   document.getElementById('raffle-on').addEventListener('change', () => syncKnob('raffle-on','raffle-on-knob'));
   document.getElementById('apwd').addEventListener('keydown', e => { if(e.key==='Enter') chkLogin(); });
   document.getElementById('btn-cancel-seat').addEventListener('click', cancelSeat);
-  renderPublic(); // render immediately with cached data
-  await cloudLoad(); // then fetch fresh from cloud
-  renderPublic(); // re-render with cloud data
+  renderPublic(); // instant render from cache
+
+  // 2. Fetch from cloud in background — no blocking
+  cloudLoad(true);
+
+  // 3. Start real-time polling
+  startPolling();
 };
 
 function syncKnob(inpId, knobId) {
@@ -823,15 +842,15 @@ function onSeatClick(trip, num, info, isPend) {
     return;
   }
   if(info) {
-    // Show info sheet
+    // Show info sheet — only initials and status, no personal data
     document.getElementById('sv-form').style.display='none';
     document.getElementById('sv-info').style.display='block';
     document.getElementById('sm-title').textContent='Puesto #'+num;
     document.getElementById('sm-sub').textContent='ID: '+genId(trip,num);
     document.getElementById('si-id').textContent=genId(trip,num);
-    document.getElementById('si-name').textContent=info.name;
-    document.getElementById('si-wa').textContent=info.wa;
-    document.getElementById('si-status').innerHTML=`<span class="dot ${info.paid?'dp':'dw'}"></span>${info.paid?'Pago confirmado por el administrador':'En espera de confirmacion de pago'}`;
+    document.getElementById('si-name').textContent=info.initials;
+    document.getElementById('si-wa').textContent='';
+    document.getElementById('si-status').innerHTML=`<span class="dot ${info.paid?'dp':'dw'}"></span>${info.paid?'Pago confirmado — puesto ocupado':'Apartado — en espera de confirmacion de pago'}`;
     openOv('ov-seat');
     return;
   }
@@ -1153,27 +1172,58 @@ function massNotify(type){
 }
 
 // ===== RAFFLE =====
+// raffleState tracks: target count, already-revealed winners, pool
+let raffleState = null;
+
 function doRaffle(){
   const at=getActive(); if(!at){toast('No hay viaje activo','terr');return;}
-  const n=parseInt(document.getElementById('rfc-n').value)||1;
-  const free=[];
-  for(let i=1;i<=at.seats;i++) if(!(at.passengers||{})[i]) free.push(i);
-  if(!free.length){toast('No hay puestos disponibles para sortear','terr');return;}
-  const actual=Math.min(n,free.length);
-  const pool=[...free]; const winners=[];
-  for(let i=0;i<actual;i++){const idx=Math.floor(Math.random()*pool.length);winners.push(pool.splice(idx,1)[0]);}
-  at.winners=winners; save(); renderPublic();
-  document.getElementById('adm-winners').innerHTML=winners.map(w=>
-    `<div class="wp-pill"><i class="fas fa-trophy" style="margin-right:4px"></i>Puesto #${w}</div>`
+
+  const target = parseInt(document.getElementById('rfc-n').value)||1;
+
+  // If there are already locked winners, reveal one more
+  const current = at.winners || [];
+
+  // If we already revealed all requested, block further presses
+  if(current.length >= target){
+    toast('Sorteo completo. Restablece para sortear de nuevo.','twarn');
+    return;
+  }
+
+  // Build pool: free seats not already drawn
+  const free = [];
+  for(let i=1;i<=at.seats;i++){
+    if(!(at.passengers||{})[i] && !current.includes(i)) free.push(i);
+  }
+  if(!free.length){toast('No quedan puestos disponibles para sortear','terr');return;}
+
+  // Pick one new winner
+  const idx = Math.floor(Math.random() * free.length);
+  const newWinner = free[idx];
+
+  at.winners = [...current, newWinner];
+  save(); renderPublic();
+
+  // Show all winners so far in admin panel
+  const step = at.winners.length;
+  document.getElementById('adm-winners').innerHTML = at.winners.map((w,i)=>
+    `<div class="wp-pill" style="${i===step-1?'animation:wpulse 0.6s ease-in-out 3':''}">`+
+    `<i class="fas fa-trophy" style="margin-right:4px"></i>Puesto #${w}</div>`
   ).join('');
-  toast(`${winners.length} ganador(es) sorteados`,'tinfo');
+
+  toast(`Ganador ${step} de ${target}: Puesto #${newWinner}`,'tinfo');
+
+  // Disable button if all revealed
+  if(at.winners.length >= target){
+    toast(`Sorteo completo — ${target} ganador(es) revelados`,'tok');
+  }
 }
 
 function clearRaffle(){
   const at=getActive(); if(!at) return;
   at.winners=[]; save(); renderPublic();
   document.getElementById('adm-winners').innerHTML='';
-  toast('Sorteo limpiado');
+  raffleState=null;
+  toast('Sorteo restablecido');
 }
 
 // ===== TOAST =====
