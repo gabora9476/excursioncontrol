@@ -4,8 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Excursion Control</title>
+<!-- FAVICON: cambia este href por el link de tu imagen -->
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448339.png">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448339.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Vercel Analytics -->
+<script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
 <style>
 :root{
   --c1:#0a1628;--c2:#112240;--c3:#1d3a5f;
@@ -376,7 +381,7 @@ footer span{color:var(--accent);font-weight:600}
   </div>
 </main>
 
-<footer>Excursion Control &copy; 2025 &nbsp;&bull;&nbsp; Powered by <span>gabora646</span></footer>
+<footer>Excursion Control &copy; 2025 &nbsp;&bull;&nbsp; Powered by <a href="https://instagram.com/gabora646" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;text-decoration:none">gabora646</a></footer>
 </div>
 
 <div class="had" onclick="openLogin()"><i class="fas fa-lock"></i></div>
@@ -543,19 +548,67 @@ let fEditId = null, fVeh = null, fSeats = 0;
 let pending = [];   // seat numbers selected but not yet sent
 let curFloor = 1;
 
-// ===== PERSIST =====
-const load = () => { try { const d = localStorage.getItem('ec4'); if(d) S = {...S,...JSON.parse(d)}; } catch(e){} };
-const save = () => localStorage.setItem('ec4', JSON.stringify(S));
+// ===== JSONBIN CLOUD SYNC =====
+const BIN_ID  = '69eabd16856a68218967ae94';
+const BIN_KEY = '$2a$10$BHNFFV8jxDgvi0gw16Wc7OjedzrlCHMo5hAh2z9e.SV5uFUaUB2uW';
+const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+let saveTimer = null;
+let isSaving  = false;
+
+async function cloudLoad() {
+  try {
+    const r = await fetch(`${BIN_URL}/latest`, {
+      headers: { 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if(r.ok) {
+      const data = await r.json();
+      if(data && typeof data === 'object' && data.trips !== undefined) {
+        S = { ...S, ...data };
+        localStorage.setItem('ec4', JSON.stringify(S));
+      }
+    }
+  } catch(e) {
+    // offline fallback — use localStorage
+    try { const d = localStorage.getItem('ec4'); if(d) S = {...S,...JSON.parse(d)}; } catch(_){}
+  }
+}
+
+async function cloudSave() {
+  localStorage.setItem('ec4', JSON.stringify(S)); // always cache locally
+  if(isSaving) return;
+  isSaving = true;
+  try {
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': BIN_KEY
+      },
+      body: JSON.stringify(S)
+    });
+  } catch(e) { /* silent fail — data is still in localStorage */ }
+  isSaving = false;
+}
+
+// Debounced save: waits 800ms after last change before pushing to cloud
+function save() {
+  localStorage.setItem('ec4', JSON.stringify(S));
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(cloudSave, 800);
+}
 
 // ===== BOOT =====
-window.onload = () => {
-  load();
+window.onload = async () => {
+  // Load local first for instant render, then sync from cloud
+  try { const d = localStorage.getItem('ec4'); if(d) S = {...S,...JSON.parse(d)}; } catch(e){}
   syncKnob('f-active','fak');
   document.getElementById('f-active').addEventListener('change', () => syncKnob('f-active','fak'));
   document.getElementById('raffle-on').addEventListener('change', () => syncKnob('raffle-on','raffle-on-knob'));
   document.getElementById('apwd').addEventListener('keydown', e => { if(e.key==='Enter') chkLogin(); });
   document.getElementById('btn-cancel-seat').addEventListener('click', cancelSeat);
-  renderPublic();
+  renderPublic(); // render immediately with cached data
+  await cloudLoad(); // then fetch fresh from cloud
+  renderPublic(); // re-render with cloud data
 };
 
 function syncKnob(inpId, knobId) {
