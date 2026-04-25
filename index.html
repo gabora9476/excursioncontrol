@@ -4,12 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Excursion Control</title>
-<!-- FAVICON: cambia este href por el link de tu imagen -->
 <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3448/3448339.png">
 <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448339.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<!-- Vercel Analytics -->
 <script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
 <style>
 :root{
@@ -98,6 +96,27 @@ main{flex:1;padding:14px;max-width:500px;margin:0 auto;width:100%}
   display:flex;flex-direction:column;gap:2px}
 @keyframes wpulse{from{box-shadow:0 0 4px rgba(245,158,11,0.25)}to{box-shadow:0 0 14px rgba(245,158,11,0.65)}}
 
+/* PUBLIC SOLO RAFFLE BANNER */
+.pub-sorteos{display:none;margin-bottom:14px}
+.pub-sorteo-card{background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(59,130,246,0.07));
+  border:1px solid rgba(245,158,11,0.3);border-radius:14px;padding:13px;margin-bottom:10px;
+  position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.pub-sorteo-card:hover{border-color:rgba(245,158,11,0.55);background:linear-gradient(135deg,rgba(245,158,11,0.16),rgba(59,130,246,0.1))}
+.pub-sorteo-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent3),var(--accent2))}
+.psc-tag{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--accent3);
+  margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.psc-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:5px}
+.psc-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.psc-meta span{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.psc-meta i{color:var(--accent2);font-size:10px}
+.psc-btn{display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--accent3),#d97706);
+  border:none;border-radius:8px;padding:7px 14px;color:#fff;
+  font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.psc-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(245,158,11,0.35)}
+.psc-winners{margin-top:8px}
+
 .legend{display:none;flex-wrap:wrap;gap:10px;margin-bottom:12px}
 .li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
 .ld{width:10px;height:10px;border-radius:3px}
@@ -132,6 +151,23 @@ main{flex:1;padding:14px;max-width:500px;margin:0 auto;width:100%}
 .seat-spacer{flex-shrink:0;visibility:hidden}
 .si{font-size:8px;font-weight:800;line-height:1;text-align:center;max-width:90%;overflow:hidden;white-space:nowrap;color:inherit}
 .sn{font-weight:700;color:var(--muted)}
+
+/* SOLO RAFFLE TICKET GRID */
+.ticket-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;margin-bottom:10px}
+.tkt{border-radius:8px;border:1.5px solid var(--sfb);background:var(--sf);
+  cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;
+  height:44px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
+  user-select:none;position:relative;flex-direction:column;gap:1px}
+.tkt:hover:not(.tkt-taken):not(.tkt-pending){
+  transform:scale(1.08);background:rgba(0,212,170,0.28);
+  border-color:var(--accent);box-shadow:0 0 10px rgba(0,212,170,0.38)}
+.tkt-num{font-size:11px;font-weight:800;line-height:1}
+.tkt-ini{font-size:8px;font-weight:600;opacity:.8;line-height:1}
+.tkt-taken{background:var(--st);border-color:var(--stb)}
+.tkt-paid{background:var(--sp);border-color:var(--spb)}
+.tkt-winner{background:var(--sw);border-color:var(--swb);animation:wpulse 1.3s ease-in-out infinite alternate}
+.tkt-pending{background:rgba(59,130,246,0.28);border-color:var(--accent2);
+  box-shadow:0 0 8px rgba(59,130,246,0.4)}
 
 .overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.72);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -185,6 +221,7 @@ main{flex:1;padding:14px;max-width:500px;margin:0 auto;width:100%}
 .btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff}
 .btn-sm{padding:7px 12px;font-size:11px;border-radius:8px;width:auto;flex-shrink:0}
 .btn-outline{background:transparent;border:1px solid var(--gb);color:var(--muted)}
+.btn-amber{background:linear-gradient(135deg,var(--accent3),#d97706);color:#fff;box-shadow:0 4px 18px rgba(245,158,11,0.2)}
 
 .sir{display:flex;align-items:center;gap:9px;margin-bottom:10px}
 .sidtag{padding:5px 11px;border-radius:7px;
@@ -328,6 +365,19 @@ main{flex:1;padding:14px;max-width:500px;margin:0 auto;width:100%}
 .prize-empty{font-size:11px;color:var(--muted);text-align:center;padding:18px;
   background:var(--glass);border:1px solid var(--gb);border-radius:10px}
 
+/* Solo Raffle Admin styles */
+.sraffle-item{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--glass);border:1px solid var(--gb);border-radius:11px;
+  padding:10px 12px;margin-bottom:7px;transition:.2s}
+.sraffle-item.sr-active{border-color:rgba(245,158,11,0.5);background:rgba(245,158,11,0.05)}
+.sri-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:2px}
+.sri-meta{font-size:10px;color:var(--muted)}
+
+/* Sync indicator */
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;
+  margin-left:5px;animation:syncpulse 1s ease-in-out infinite}
+@keyframes syncpulse{0%,100%{opacity:1}50%{opacity:.3}}
+
 footer{text-align:center;padding:14px;font-size:10px;color:var(--muted);
   border-top:1px solid var(--gb);margin-top:auto}
 footer span{color:var(--accent);font-weight:600}
@@ -364,6 +414,9 @@ footer span{color:var(--accent);font-weight:600}
     <p>Sin excursiones activas</p>
     <p>El administrador no ha configurado ningun viaje todavia.</p>
   </div>
+
+  <!-- PUBLIC SOLO RAFFLES -->
+  <div class="pub-sorteos" id="pub-sorteos"></div>
 
   <div class="trip-card" id="trip-card">
     <div class="tc-head">
@@ -413,7 +466,7 @@ footer span{color:var(--accent);font-weight:600}
 
 <div class="had" onclick="openLogin()"><i class="fas fa-lock"></i></div>
 
-<!-- SEAT MODAL -->
+<!-- SEAT MODAL (trip) -->
 <div class="overlay" id="ov-seat">
   <div class="sheet">
     <div class="handle"></div>
@@ -448,6 +501,41 @@ footer span{color:var(--accent);font-weight:600}
   </div>
 </div>
 
+<!-- TICKET MODAL (solo raffle) -->
+<div class="overlay" id="ov-ticket">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="mt" id="tk-title">Apartar Ticket</div>
+    <div class="ms" id="tk-sub">Completa tus datos</div>
+    <div id="tv-form">
+      <div class="ssbar" id="tk-ssbar"><span class="ssb-lbl">Tickets:</span><div id="tk-chips"></div></div>
+      <div class="fg">
+        <label class="fl">Nombre y Apellido</label>
+        <input class="fi" id="tk-name" type="text" placeholder="JUAN PEREZ" oninput="onTkName(this)">
+        <div class="prev-row">
+          <div class="pbadge" id="tk-name-prev">??</div>
+          <div class="prev-info">Iniciales en el ticket<br><span style="color:var(--accent3);font-size:10px">Escribe nombre y apellido</span></div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Numero WhatsApp</label>
+        <input class="fi" id="tk-wa" type="tel" placeholder="04228745777" oninput="onTkWa(this)">
+      </div>
+      <div id="tk-cost-row" class="cost-row" style="display:none">
+        <span class="cr-lbl"><i class="fas fa-tag" style="margin-right:5px;color:var(--accent3)"></i>Total a pagar</span>
+        <span class="cr-amt" id="tk-total">-</span>
+      </div>
+      <button class="btn btn-wa" onclick="sendTicketWA()"><i class="fab fa-whatsapp"></i> Confirmar por WhatsApp</button>
+      <button class="btn btn-ghost" id="btn-cancel-ticket">Cancelar</button>
+    </div>
+    <div id="tv-info" style="display:none">
+      <div class="sir"><div class="sidtag" id="tki-id"></div><div><div style="font-weight:600;font-size:14px" id="tki-name"></div></div></div>
+      <div class="sl" id="tki-status"></div>
+      <button class="btn btn-ghost" onclick="closeOv('ov-ticket')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div class="login-ov" id="ov-login">
   <div class="lbox">
@@ -471,6 +559,7 @@ footer span{color:var(--accent);font-weight:600}
       <button class="tb active" onclick="admTab('viajes',this)"><i class="fas fa-route"></i> Viajes</button>
       <button class="tb" onclick="admTab('pasajeros',this)"><i class="fas fa-users"></i> Pasajeros</button>
       <button class="tb" onclick="admTab('sorteo',this)"><i class="fas fa-ticket"></i> Sorteo</button>
+      <button class="tb" onclick="admTab('sorteos-solos',this)"><i class="fas fa-star"></i> Sorteos</button>
       <button class="tb" onclick="admTab('avisos',this)"><i class="fas fa-bell"></i> Avisos</button>
     </div>
 
@@ -535,10 +624,8 @@ footer span{color:var(--accent);font-weight:600}
       </div>
     </div>
 
-    <!-- SORTEO -->
+    <!-- SORTEO (del viaje) -->
     <div class="tc" id="tc-sorteo">
-
-      <!-- Config del sorteo -->
       <div class="asec">
         <div class="ast"><i class="fas fa-gear"></i> Configurar Sorteo</div>
         <div class="fg">
@@ -561,13 +648,9 @@ footer span{color:var(--accent);font-weight:600}
         </div>
         <button class="btn btn-primary" onclick="saveRaffleConfig()"><i class="fas fa-floppy-disk"></i> Guardar configuracion del sorteo</button>
       </div>
-
-      <!-- Ejecucion -->
       <div class="asec">
         <div class="ast"><i class="fas fa-shuffle"></i> Ejecutar Sorteo</div>
         <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Presiona <b style="color:var(--accent)">Sortear</b> una vez por cada ganador. Los numeros anteriores quedan bloqueados. Usa <b style="color:var(--accent3)">Restablecer</b> para empezar de nuevo.</p>
-
-        <!-- Progress bar -->
         <div style="background:var(--glass);border:1px solid var(--gb);border-radius:8px;height:6px;margin-bottom:12px;overflow:hidden">
           <div id="raffle-progress" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:8px;transition:width .4s ease;width:0%"></div>
         </div>
@@ -575,16 +658,165 @@ footer span{color:var(--accent);font-weight:600}
           <span id="raffle-step-label">0 / 0 sorteados</span>
           <span id="raffle-status-label" style="color:var(--accent3)"></span>
         </div>
-
         <div style="display:flex;gap:8px;margin-bottom:12px">
           <button class="btn btn-primary" id="raffle-btn" onclick="doRaffle()" style="flex:2"><i class="fas fa-shuffle"></i> Sortear siguiente</button>
           <button class="btn btn-ghost" onclick="clearRaffle()" style="flex:1;margin-top:0"><i class="fas fa-eraser"></i> Restablecer</button>
         </div>
-
-        <!-- Winners list with prizes and notify -->
         <div id="adm-winners-list"></div>
       </div>
+    </div>
 
+    <!-- SORTEOS SOLOS (standalone) -->
+    <div class="tc" id="tc-sorteos-solos">
+      <!-- List of solo raffles -->
+      <div class="asec" id="sr-list-sec">
+        <div class="ast"><i class="fas fa-star"></i> Sorteos Independientes</div>
+        <div id="sr-list"></div>
+        <button class="btn btn-amber" style="margin-top:8px" onclick="newSoloRaffle()"><i class="fas fa-plus"></i> Nuevo Sorteo</button>
+      </div>
+
+      <!-- Solo raffle form -->
+      <div class="asec" id="sr-form-wrap" style="display:none">
+        <div class="ast"><i class="fas fa-pencil"></i> <span id="sr-form-lbl">Nuevo Sorteo</span></div>
+        <div class="fg"><label class="fl">Nombre del Sorteo</label><input class="fi" id="sr-name" type="text" placeholder="Ej: Gran Sorteo Navidad 2025"></div>
+        <div class="fg"><label class="fl">Descripcion / Premio Principal</label><input class="fi" id="sr-desc" type="text" placeholder="Ej: TV 55 pulgadas + Efectivo"></div>
+        <div class="fg">
+          <label class="fl">Premios por posicion (uno por linea)</label>
+          <textarea class="fi" id="sr-prizes" rows="3" placeholder="1er lugar: TV 55&#10;2do lugar: $100&#10;3er lugar: Cesta" style="resize:vertical;line-height:1.5"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <div style="flex:1">
+            <label class="fl">Cant. de Tickets</label>
+            <input class="fi" id="sr-tickets" type="number" min="1" max="1000" value="100" placeholder="100">
+          </div>
+          <div style="flex:1">
+            <label class="fl">Cant. de Ganadores</label>
+            <input class="fi" id="sr-winners-n" type="number" min="1" max="100" value="1" placeholder="1">
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">Precio por Ticket (opcional)</label>
+          <input class="fi" id="sr-price" type="text" placeholder="Ej: $5 o Bs. 50.000 (dejar vacio si es gratis)">
+        </div>
+        <div class="fg">
+          <div class="tog-row">
+            <span style="font-size:13px">Visible al publico</span>
+            <label class="tog-wrap">
+              <input type="checkbox" id="sr-active" checked onchange="syncKnob('sr-active','sr-active-knob')">
+              <div class="tog-track" id="sr-active-track"></div>
+              <div class="tog-knob" id="sr-active-knob"></div>
+            </label>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-amber" onclick="saveSoloRaffle()"><i class="fas fa-floppy-disk"></i> Guardar</button>
+          <button class="btn btn-ghost" style="margin-top:0" onclick="cancelSoloRaffleForm()">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Solo raffle management -->
+      <div id="sr-manage-wrap" style="display:none">
+        <div class="asec">
+          <div class="ast"><i class="fas fa-gear"></i> <span id="sr-manage-name">Sorteo</span></div>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:10px" id="sr-manage-desc"></p>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px">
+            <button class="btn btn-ghost btn-sm" style="margin-top:0" onclick="editSoloRaffle(curSrId)"><i class="fas fa-pencil"></i> Editar</button>
+            <button class="btn btn-ghost btn-sm" style="margin-top:0" onclick="cancelSoloManage()"><i class="fas fa-arrow-left"></i> Volver</button>
+          </div>
+        </div>
+
+        <!-- Ticket progress -->
+        <div class="asec">
+          <div class="ast"><i class="fas fa-chart-bar"></i> Estado de Tickets</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px">
+            <div class="sc"><div class="sc-n" style="color:var(--accent)" id="sr-stat-free">0</div><div class="sc-l">Libres</div></div>
+            <div class="sc"><div class="sc-n" style="color:var(--accent2)" id="sr-stat-taken">0</div><div class="sc-l">Apartados</div></div>
+            <div class="sc"><div class="sc-n" style="color:var(--success)" id="sr-stat-paid">0</div><div class="sc-l">Pagados</div></div>
+          </div>
+          <div class="legend" style="display:flex">
+            <div class="li"><div class="ld ldf"></div>Libre</div>
+            <div class="li"><div class="ld ldt"></div>Apartado</div>
+            <div class="li"><div class="ld ldp"></div>Pagado</div>
+            <div class="li"><div class="ld ldw"></div>Ganador</div>
+          </div>
+        </div>
+
+        <!-- Ticket grid -->
+        <div class="asec">
+          <div class="ast"><i class="fas fa-grip"></i> Tickets</div>
+          <div id="sr-ticket-grid" class="ticket-grid"></div>
+        </div>
+
+        <!-- Participants list -->
+        <div class="asec">
+          <div class="ast"><i class="fas fa-users"></i> Participantes</div>
+          <div id="sr-participants-list"></div>
+        </div>
+
+        <!-- Raffle execution -->
+        <div class="asec">
+          <div class="ast"><i class="fas fa-shuffle"></i> Realizar Sorteo</div>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Elige el metodo de sorteo:</p>
+
+          <!-- Method tabs -->
+          <div style="display:flex;gap:6px;margin-bottom:12px">
+            <button class="ftab active" id="sr-meth-rnd" onclick="setSrMethod('random',this)" style="flex:1;padding:8px 5px;font-size:10px">
+              <i class="fas fa-shuffle"></i> Aleatorio
+            </button>
+            <button class="ftab" id="sr-meth-lot" onclick="setSrMethod('lottery',this)" style="flex:1;padding:8px 5px;font-size:10px">
+              <i class="fas fa-ticket"></i> Loteria VE
+            </button>
+          </div>
+
+          <!-- Lottery config -->
+          <div id="sr-lottery-cfg" style="display:none;margin-bottom:12px">
+            <div class="fg">
+              <label class="fl">Loteria venezolana</label>
+              <select class="fi" id="sr-lot-name">
+                <option value="Loteria de Caracas">Loteria de Caracas</option>
+                <option value="LOTTO">LOTTO (Loteria del Tachira)</option>
+                <option value="Loteria del Zulia">Loteria del Zulia</option>
+                <option value="La Granjita">La Granjita</option>
+                <option value="El Kino">El Kino</option>
+                <option value="Triple Zodiacal">Triple Zodiacal</option>
+                <option value="Animalitos">Animalitos</option>
+                <option value="Otra">Otra loteria</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Numero(s) ganador(es) de la loteria</label>
+              <input class="fi" id="sr-lot-result" type="text" placeholder="Ej: 1234 o 12, 34, 56">
+            </div>
+            <div class="fg">
+              <label class="fl">Regla de coincidencia</label>
+              <select class="fi" id="sr-lot-rule">
+                <option value="exact">Numero exacto</option>
+                <option value="last2">Ultimas 2 cifras</option>
+                <option value="last3">Ultimas 3 cifras</option>
+                <option value="first2">Primeras 2 cifras</option>
+              </select>
+            </div>
+            <button class="btn btn-amber" onclick="doLotteryRaffle()"><i class="fas fa-ticket"></i> Aplicar resultado de loteria</button>
+          </div>
+
+          <!-- Random raffle -->
+          <div id="sr-random-cfg">
+            <div style="background:var(--glass);border:1px solid var(--gb);border-radius:8px;height:6px;margin-bottom:10px;overflow:hidden">
+              <div id="sr-raffle-progress" style="height:100%;background:linear-gradient(90deg,var(--accent3),var(--accent2));border-radius:8px;transition:width .4s ease;width:0%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:10px">
+              <span id="sr-raffle-step">0 / 0 sorteados</span>
+              <span id="sr-raffle-status" style="color:var(--accent3)"></span>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+              <button class="btn btn-amber" id="sr-raffle-btn" onclick="doSoloRaffle()" style="flex:2"><i class="fas fa-shuffle"></i> Sortear siguiente</button>
+              <button class="btn btn-ghost" onclick="clearSoloRaffle()" style="flex:1;margin-top:0"><i class="fas fa-eraser"></i> Restablecer</button>
+            </div>
+          </div>
+
+          <div id="sr-winners-list"></div>
+        </div>
+      </div>
     </div>
 
     <!-- AVISOS -->
@@ -609,18 +841,23 @@ footer span{color:var(--accent);font-weight:600}
 <script>
 // ===== STATE =====
 const ADMIN_WA = '584228745777';
-let S = { pwd:'1234', trips:[] };
+let S = { pwd:'1234', trips:[], soloRaffles:[] };
 let fEditId = null, fVeh = null, fSeats = 0;
-let pending = [];   // seat numbers selected but not yet sent
+let pending = [];
 let curFloor = 1;
+let curSrId = null;       // currently managed solo raffle id
+let srPending = [];       // pending tickets for solo raffle
+let srMethod = 'random';  // 'random' | 'lottery'
+let srEditId = null;      // editing solo raffle form
 
-// ===== JSONBIN CLOUD SYNC (REAL-TIME) =====
+// ===== JSONBIN CLOUD SYNC (REAL-TIME, ZERO DELAY UI) =====
 const BIN_ID  = '69eabd16856a68218967ae94';
 const BIN_KEY = '$2a$10$BHNFFV8jxDgvi0gw16Wc7OjedzrlCHMo5hAh2z9e.SV5uFUaUB2uW';
 const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 let isSaving = false;
 let pollTimer = null;
 let lastSavedHash = '';
+let saveQueue = false;
 
 function hashStr(obj) {
   const s = JSON.stringify(obj);
@@ -630,7 +867,7 @@ function hashStr(obj) {
 }
 
 async function cloudLoad(silent=false) {
-  if(isSaving) return; // don't overwrite state mid-save
+  if(isSaving) return;
   try {
     const r = await fetch(`${BIN_URL}/latest`, {
       headers: { 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' }
@@ -641,82 +878,93 @@ async function cloudLoad(silent=false) {
         const incoming = hashStr(data);
         if(incoming !== lastSavedHash) {
           S = { ...S, ...data };
+          if(!S.soloRaffles) S.soloRaffles = [];
           lastSavedHash = incoming;
           localStorage.setItem('ec4', JSON.stringify(S));
           renderPublic();
-          // If admin panel is open, refresh its lists too
           if(document.getElementById('adm').classList.contains('open')) {
             renderAdmPass();
             renderAdmNotify();
+            renderAdmTrips();
             const at = getActive();
             if(at) syncRaffleBtn(at);
+            if(curSrId) renderSoloManage(curSrId);
           }
         }
       }
     }
-  } catch(e) { /* offline — stay with local */ }
+  } catch(e) {}
 }
 
-async function cloudSave() {
-  if(isSaving) return;
+async function cloudSaveExec() {
+  if(isSaving) { saveQueue = true; return; }
   isSaving = true;
+  saveQueue = false;
   try {
-    const body = JSON.stringify(S);
     await fetch(BIN_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
-      body
+      body: JSON.stringify(S)
     });
     lastSavedHash = hashStr(S);
-  } catch(e) { /* silent fail */ }
+  } catch(e) {}
   isSaving = false;
+  if(saveQueue) cloudSaveExec();
 }
 
-// save() is 100% synchronous from the UI's perspective.
-// It writes localStorage instantly, updates the hash so polling
-// won't overwrite our own change, then fires the cloud save
-// in the background after a 1.5s debounce — never blocking the UI.
+// save(): instant localStorage + UI update, cloud in ~300ms debounce
 let _saveDebounce = null;
 function save() {
   localStorage.setItem('ec4', JSON.stringify(S));
   lastSavedHash = hashStr(S);
   clearTimeout(_saveDebounce);
-  _saveDebounce = setTimeout(() => cloudSave(), 1500);
+  _saveDebounce = setTimeout(() => cloudSaveExec(), 300);
 }
 
-// Poll every 5 seconds for changes from other devices/sessions
 function startPolling() {
   clearInterval(pollTimer);
-  pollTimer = setInterval(() => cloudLoad(true), 5000);
+  pollTimer = setInterval(() => cloudLoad(true), 4000);
 }
 
 // ===== BOOT =====
 window.onload = async () => {
-  // 1. Load from localStorage instantly — no loading screen
-  try { const d = localStorage.getItem('ec4'); if(d) { S = {...S,...JSON.parse(d)}; lastSavedHash = hashStr(S); } } catch(e){}
+  try {
+    const d = localStorage.getItem('ec4');
+    if(d) {
+      const parsed = JSON.parse(d);
+      S = {...S, ...parsed};
+      if(!S.soloRaffles) S.soloRaffles = [];
+      lastSavedHash = hashStr(S);
+    }
+  } catch(e){}
+
   syncKnob('f-active','fak');
+  syncKnob('sr-active','sr-active-knob');
   document.getElementById('f-active').addEventListener('change', () => syncKnob('f-active','fak'));
   document.getElementById('raffle-on').addEventListener('change', () => syncKnob('raffle-on','raffle-on-knob'));
+  document.getElementById('sr-active').addEventListener('change', () => syncKnob('sr-active','sr-active-knob'));
   document.getElementById('apwd').addEventListener('keydown', e => { if(e.key==='Enter') chkLogin(); });
   document.getElementById('btn-cancel-seat').addEventListener('click', cancelSeat);
-  renderPublic(); // instant render from cache
+  document.getElementById('btn-cancel-ticket').addEventListener('click', cancelTicket);
 
-  // 2. Fetch from cloud in background — no blocking
+  // Date display
+  const now = new Date();
+  document.getElementById('hdate').textContent = fmtDate(now.toISOString().slice(0,10));
+
+  renderPublic();
   cloudLoad(true);
-
-  // 3. Start real-time polling
   startPolling();
 };
 
 function syncKnob(inpId, knobId) {
   const on = document.getElementById(inpId).checked;
   const knob = document.getElementById(knobId);
-  const track = document.getElementById(inpId + '-track') || document.getElementById(knobId.replace('-knob','-track'));
   if(knob) knob.style.transform = on ? 'translateX(20px)' : '';
-  // track color via parent label's sibling
   const inp = document.getElementById(inpId);
-  const tr = inp.nextElementSibling;
-  if(tr && tr.classList.contains('tog-track')) tr.style.background = on ? 'var(--accent)' : '';
+  if(inp) {
+    const tr = inp.nextElementSibling;
+    if(tr && tr.classList.contains('tog-track')) tr.style.background = on ? 'var(--accent)' : '';
+  }
 }
 
 // ===== HELPERS =====
@@ -762,6 +1010,14 @@ function calcTotal(trip) {
   const sym = (trip.cost||'').replace(/[\d.,\s]/g,'').trim();
   return sym+(n*pending.length).toLocaleString('es-VE');
 }
+function calcTkTotal(sr) {
+  if(!sr.price) return 'Gratis';
+  const numStr = (sr.price||'').replace(/[^\d.,]/g,'').replace(',','.');
+  const n = parseFloat(numStr);
+  if(isNaN(n)||!srPending.length) return sr.price+(srPending.length>1?` x${srPending.length}`:'');
+  const sym = (sr.price||'').replace(/[\d.,\s]/g,'').trim();
+  return sym+(n*srPending.length).toLocaleString('es-VE');
+}
 
 // ===== PUBLIC RENDER =====
 function renderPublic() {
@@ -784,6 +1040,9 @@ function renderPublic() {
   const leg = document.getElementById('leg');
   const bw = document.getElementById('bus-wrapper');
 
+  // Public solo raffles
+  renderPublicSoloRaffles();
+
   if(!active) {
     notrip.style.display = 'block'; card.style.display = 'none';
     srow.style.display = 'none'; leg.style.display = 'none';
@@ -805,7 +1064,6 @@ function renderPublic() {
   document.getElementById('tc-cost').textContent = active.cost;
   document.getElementById('hdate').textContent = fmtDate(active.date);
 
-  // stats
   const total = active.seats;
   const pass = active.passengers||{};
   const taken = Object.keys(pass).length;
@@ -814,7 +1072,6 @@ function renderPublic() {
   document.getElementById('s-taken').textContent = taken - paid;
   document.getElementById('s-paid').textContent = paid;
 
-  // winners public — show ALL winners when raffleOn is enabled
   const wp = document.getElementById('winn-pub');
   const winners = active.winners || [];
   if(active.raffleOn && winners.length) {
@@ -836,11 +1093,189 @@ function renderPublic() {
     document.getElementById('wp-pills').innerHTML = '';
   }
 
-  // floor tabs
   const ft = document.getElementById('floor-tabs');
   ft.style.display = active.doubleDeck ? 'flex' : 'none';
-
   renderSeats(active);
+}
+
+function renderPublicSoloRaffles() {
+  const container = document.getElementById('pub-sorteos');
+  const visible = (S.soloRaffles||[]).filter(sr => sr.active);
+  if(!visible.length) { container.style.display = 'none'; return; }
+  container.style.display = 'block';
+  container.innerHTML = visible.map(sr => {
+    const tickets = sr.tickets || {};
+    const total = sr.totalTickets || 100;
+    const taken = Object.keys(tickets).length;
+    const winners = sr.winners || [];
+    const winHtml = winners.length
+      ? `<div class="psc-winners">${winners.map((tk,i)=>{
+          const pos = i+1;
+          const posLabel = pos===1?'1ro':pos===2?'2do':pos===3?'3ro':`${pos}to`;
+          const prize = (sr.prizes||[])[i] || '';
+          return `<div class="wp-pill" style="margin-bottom:5px;flex-direction:column;gap:0;padding:6px 11px">
+            <span><i class="fas fa-trophy" style="margin-right:5px;font-size:10px"></i>${posLabel} — Ticket #${tk}</span>
+            ${prize?`<span style="font-size:10px;opacity:.8">${prize}</span>`:''}
+          </div>`;
+        }).join('')}</div>` : '';
+    return `<div class="pub-sorteo-card" onclick="openPublicRaffle('${sr.id}')">
+      <div class="psc-tag"><i class="fas fa-ticket"></i> SORTEO INDEPENDIENTE</div>
+      <div class="psc-name">${sr.name}</div>
+      ${sr.desc?`<p style="font-size:11px;color:var(--muted);margin-bottom:8px">${sr.desc}</p>`:''}
+      <div class="psc-meta">
+        <span><i class="fas fa-ticket"></i>${total - taken} tickets libres</span>
+        <span><i class="fas fa-users"></i>${taken} participantes</span>
+        ${sr.price?`<span><i class="fas fa-tag"></i>${sr.price} por ticket</span>`:'<span><i class="fas fa-gift"></i>Gratis</span>'}
+      </div>
+      ${winners.length?winHtml:`<button class="psc-btn"><i class="fas fa-ticket"></i> Ver & Apartar Ticket</button>`}
+    </div>`;
+  }).join('');
+}
+
+// ===== PUBLIC SOLO RAFFLE MODAL =====
+let pubRaffleId = null;
+function openPublicRaffle(srId) {
+  pubRaffleId = srId;
+  srPending = [];
+  const sr = (S.soloRaffles||[]).find(x=>x.id===srId);
+  if(!sr) return;
+  // Re-use the ticket overlay
+  document.getElementById('tk-title').textContent = sr.name;
+  document.getElementById('tk-sub').textContent = sr.desc || 'Selecciona uno o mas tickets';
+  document.getElementById('tv-form').style.display = 'block';
+  document.getElementById('tv-info').style.display = 'none';
+  document.getElementById('tk-name').value = '';
+  document.getElementById('tk-wa').value = '';
+  document.getElementById('tk-name-prev').textContent = '??';
+  updateTkChips(sr);
+  // Show ticket grid in the sheet
+  renderPublicTicketGrid(sr);
+  openOv('ov-ticket');
+}
+
+function renderPublicTicketGrid(sr) {
+  // Render inside the sheet itself
+  let gridEl = document.getElementById('pub-tk-grid');
+  if(!gridEl) {
+    gridEl = document.createElement('div');
+    gridEl.id = 'pub-tk-grid';
+    gridEl.className = 'ticket-grid';
+    gridEl.style.marginBottom = '12px';
+    document.getElementById('tk-ssbar').parentNode.insertBefore(gridEl, document.getElementById('tk-ssbar'));
+  }
+  const tickets = sr.tickets || {};
+  const total = sr.totalTickets || 100;
+  const winners = sr.winners || [];
+  gridEl.innerHTML = '';
+  for(let i=1; i<=total; i++){
+    const info = tickets[i];
+    const isWinner = winners.includes(i);
+    const isPend = srPending.includes(i);
+    const el = document.createElement('div');
+    el.className = 'tkt';
+    let cls = '';
+    if(isPend) cls = 'tkt-pending';
+    else if(isWinner) cls = 'tkt-winner';
+    else if(info && info.paid) cls = 'tkt-paid';
+    else if(info) cls = 'tkt-taken';
+    if(cls) el.classList.add(cls);
+    el.innerHTML = `<span class="tkt-num">${i}</span>${info?`<span class="tkt-ini">${info.initials}</span>`:''}`;
+    el.onclick = () => onPublicTicketClick(sr, i, info, isPend, isWinner);
+    gridEl.appendChild(el);
+  }
+}
+
+function onPublicTicketClick(sr, num, info, isPend, isWinner) {
+  if(isWinner) { toast('Ticket ganador — no disponible','twarn'); return; }
+  if(isPend) {
+    srPending = srPending.filter(x=>x!==num);
+    updateTkChips(sr);
+    renderPublicTicketGrid(sr);
+    if(!srPending.length) document.getElementById('tk-ssbar').style.display='none';
+    return;
+  }
+  if(info) {
+    document.getElementById('tv-form').style.display='none';
+    document.getElementById('tv-info').style.display='block';
+    document.getElementById('tki-id').textContent='Ticket #'+num;
+    document.getElementById('tki-name').textContent=info.initials;
+    document.getElementById('tki-status').innerHTML=`<span class="dot ${info.paid?'dp':'dw'}"></span>${info.paid?'Pago confirmado':'Apartado — pendiente de pago'}`;
+    return;
+  }
+  srPending.push(num);
+  srPending.sort((a,b)=>a-b);
+  updateTkChips(sr);
+  renderPublicTicketGrid(sr);
+  document.getElementById('tv-form').style.display='block';
+  document.getElementById('tv-info').style.display='none';
+}
+
+function updateTkChips(sr) {
+  const bar = document.getElementById('tk-ssbar');
+  if(!srPending.length){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  document.getElementById('tk-chips').innerHTML = srPending.map(t=>
+    `<div class="chip" onclick="removeTkPend(${t})"><span>#${t}</span><i class="fas fa-xmark"></i></div>`
+  ).join('');
+  const costRow = document.getElementById('tk-cost-row');
+  if(sr && sr.price) {
+    costRow.style.display='flex';
+    document.getElementById('tk-total').textContent = calcTkTotal(sr);
+  } else costRow.style.display='none';
+}
+
+function removeTkPend(num) {
+  srPending = srPending.filter(x=>x!==num);
+  const sr = (S.soloRaffles||[]).find(x=>x.id===pubRaffleId);
+  if(sr) { updateTkChips(sr); renderPublicTicketGrid(sr); }
+  if(!srPending.length) closeOv('ov-ticket');
+}
+
+function cancelTicket() {
+  srPending=[];
+  const gridEl = document.getElementById('pub-tk-grid');
+  if(gridEl) gridEl.remove();
+  closeOv('ov-ticket');
+}
+
+function onTkName(el) {
+  el.value = el.value.toUpperCase();
+  document.getElementById('tk-name-prev').textContent = getInitials(el.value)||'??';
+}
+function onTkWa(el) {
+  let v = el.value.replace(/\D/g,'');
+  if(v.startsWith('58')) { el.value='+'+v; return; }
+  if(v.startsWith('0')) { el.value='+58'+v.substring(1); return; }
+  if(v.length) el.value='+58'+v;
+}
+
+function sendTicketWA() {
+  const name = document.getElementById('tk-name').value.trim();
+  const wa = document.getElementById('tk-wa').value.trim();
+  if(!name || name.trim().split(/\s+/).filter(Boolean).length < 2) { toast('Ingresa nombre Y apellido completos','terr'); return; }
+  if(!wa || wa.replace(/\D/g,'').length < 10) { toast('Numero de WhatsApp invalido','terr'); return; }
+  if(!srPending.length) { toast('No tienes tickets seleccionados','terr'); return; }
+
+  const sr = (S.soloRaffles||[]).find(x=>x.id===pubRaffleId);
+  if(!sr) return;
+
+  const initials = getInitials(name);
+  const waClean = normWa(wa);
+  if(!sr.tickets) sr.tickets = {};
+  srPending.forEach(t => { sr.tickets[t] = { name: name.toUpperCase(), wa: waClean, initials, paid: false }; });
+
+  save();
+  const tkList = srPending.map(t=>`#${t}`).join(', ');
+  const total = calcTkTotal(sr);
+  const msg = `Hola, quiero apartar ticket(s) para el sorteo *${sr.name}*.\n\nTickets: ${tkList}\n${sr.price?`Total: ${total}\n`:''}Nombre: ${name.toUpperCase()}\nWhatsApp: ${waClean}\n\nEspero confirmacion. Gracias.`;
+
+  window.open(`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`, '_blank');
+  srPending = [];
+  const gridEl = document.getElementById('pub-tk-grid');
+  if(gridEl) gridEl.remove();
+  closeOv('ov-ticket');
+  requestAnimationFrame(() => renderPublic());
+  toast('Redirigiendo a WhatsApp...','tinfo');
 }
 
 // ===== SEATS =====
@@ -859,7 +1294,6 @@ function renderSeats(trip) {
   const cols = isVan ? 3 : 4;
   const leftC = Math.floor(cols/2);
 
-  // Compute size
   const availW = Math.min(window.innerWidth, 500) - 28;
   const aisleW = 12;
   const gapW = 4 * (cols-1) + aisleW;
@@ -933,7 +1367,6 @@ function onSeatClick(trip, num, info, isPend) {
     return;
   }
   if(info) {
-    // Show info sheet — only initials and status, no personal data
     document.getElementById('sv-form').style.display='none';
     document.getElementById('sv-info').style.display='block';
     document.getElementById('sm-title').textContent='Puesto #'+num;
@@ -945,7 +1378,6 @@ function onSeatClick(trip, num, info, isPend) {
     openOv('ov-seat');
     return;
   }
-  // Free seat
   pending.push(num);
   pending.sort((a,b)=>a-b);
   renderSeats(trip);
@@ -988,11 +1420,9 @@ function cancelSeat() {
   closeOv('ov-seat');
 }
 
-// ===== FORM INPUTS =====
 function onName(el) {
   el.value = el.value.toUpperCase();
-  const init = getInitials(el.value);
-  document.getElementById('name-prev').textContent = init;
+  document.getElementById('name-prev').textContent = getInitials(el.value)||'??';
   const trip = getActive();
   if(trip && pending.length) renderSeats(trip);
 }
@@ -1004,7 +1434,6 @@ function onWa(el) {
   if(v.length) el.value='+58'+v;
 }
 
-// ===== SEND WA =====
 function sendWA() {
   const name = document.getElementById('p-name').value.trim();
   const wa = document.getElementById('p-wa').value.trim();
@@ -1027,7 +1456,6 @@ function sendWA() {
   toast('Redirigiendo a WhatsApp...','tinfo');
 }
 
-// ===== FLOOR =====
 function switchFloor(f,btn) {
   curFloor=f;
   document.querySelectorAll('.ftab').forEach((t,i)=>t.classList.toggle('active',i+1===f));
@@ -1039,6 +1467,9 @@ const openOv = id => document.getElementById(id).classList.add('open');
 const closeOv = id => document.getElementById(id).classList.remove('open');
 document.getElementById('ov-seat').addEventListener('click',function(e){if(e.target===this) closeOv('ov-seat');});
 document.getElementById('ov-login').addEventListener('click',function(e){if(e.target===this) closeOv('ov-login');});
+document.getElementById('ov-ticket').addEventListener('click',function(e){
+  if(e.target===this){ srPending=[]; const g=document.getElementById('pub-tk-grid'); if(g) g.remove(); closeOv('ov-ticket'); }
+});
 
 // ===== ADMIN AUTH =====
 function openLogin(){ document.getElementById('apwd').value=''; openOv('ov-login'); }
@@ -1049,7 +1480,7 @@ function chkLogin(){
 }
 function openAdm(){
   document.getElementById('adm').classList.add('open');
-  renderAdmTrips(); renderAdmPass(); renderAdmNotify();
+  renderAdmTrips(); renderAdmPass(); renderAdmNotify(); renderSoloRaffleList();
   const at=getActive();
   if(at){
     document.getElementById('raffle-on').checked=!!at.raffleOn;
@@ -1070,6 +1501,10 @@ function admTab(tab,btn){
   if(tab==='sorteo') {
     const at = getActive();
     syncRaffleUI(at||{winners:[],passengers:{}});
+  }
+  if(tab==='sorteos-solos') {
+    renderSoloRaffleList();
+    if(curSrId) renderSoloManage(curSrId);
   }
 }
 
@@ -1239,20 +1674,14 @@ function confirmPay(sn){
   const at=getActive(); if(!at||!at.passengers[sn]) return;
   at.passengers[sn].paid=true;
   save();
-  requestAnimationFrame(() => {
-    renderPublic(); renderAdmPass(); renderAdmNotify();
-    toast('Pago del Puesto #'+sn+' confirmado');
-  });
+  requestAnimationFrame(() => { renderPublic(); renderAdmPass(); renderAdmNotify(); toast('Pago del Puesto #'+sn+' confirmado'); });
 }
 
 function freeSeat(sn){
   const at=getActive(); if(!at) return;
   delete at.passengers[sn];
   save();
-  requestAnimationFrame(() => {
-    renderPublic(); renderAdmPass(); renderAdmNotify();
-    toast('Puesto #'+sn+' liberado','twarn');
-  });
+  requestAnimationFrame(() => { renderPublic(); renderAdmPass(); renderAdmNotify(); toast('Puesto #'+sn+' liberado','twarn'); });
 }
 
 function notifyOne(sn,type){
@@ -1283,7 +1712,7 @@ function massNotify(type){
   }
 }
 
-// ===== RAFFLE =====
+// ===== RAFFLE (trip) =====
 function saveRaffleConfig(){
   const at = getActive(); if(!at){ toast('No hay viaje activo','terr'); return; }
   at.raffleTitle   = document.getElementById('raffle-title').value.trim();
@@ -1297,29 +1726,22 @@ function saveRaffleConfig(){
 function doRaffle(){
   const at = getActive();
   if(!at){ toast('No hay viaje activo','terr'); return; }
-
-  // Lock target on first press
   if(!at.raffleTarget || (at.winners||[]).length === 0) {
     at.raffleTarget = parseInt(document.getElementById('rfc-n').value) || 1;
   }
   const target  = at.raffleTarget;
   const current = at.winners || [];
-
   if(current.length >= target){
     toast(`Sorteo completo (${target} ganadores). Presiona Restablecer para nuevo sorteo.`,'twarn');
     syncRaffleUI(at); return;
   }
-
   const free = [];
   for(let i = 1; i <= at.seats; i++){
     if(!(at.passengers||{})[i] && !current.includes(i)) free.push(i);
   }
   if(!free.length){ toast('No quedan puestos disponibles','terr'); return; }
-
   const newWinner = free[Math.floor(Math.random() * free.length)];
   at.winners = [...current, newWinner];
-
-  // Update UI instantly — save happens in background
   save();
   requestAnimationFrame(() => {
     renderPublic();
@@ -1332,37 +1754,27 @@ function doRaffle(){
 
 function syncRaffleUI(at){
   if(!at) at = getActive(); if(!at) return;
-
-  // Sync config fields if they have saved data
   if(at.raffleTitle !== undefined) document.getElementById('raffle-title').value = at.raffleTitle||'';
   if(at.raffleDesc  !== undefined) document.getElementById('raffle-desc').value  = at.raffleDesc||'';
   if(at.rafflePrizes !== undefined && at.rafflePrizes.length)
     document.getElementById('raffle-prizes').value = at.rafflePrizes.join('\n');
   if(at.raffleTarget) document.getElementById('rfc-n').value = at.raffleTarget;
-
   const target  = at.raffleTarget || parseInt(document.getElementById('rfc-n').value) || 1;
   const winners = at.winners || [];
   const done    = winners.length >= target;
-
-  // Progress bar
   const pct = target > 0 ? Math.round((winners.length / target) * 100) : 0;
   document.getElementById('raffle-progress').style.width = pct + '%';
   document.getElementById('raffle-step-label').textContent = `${winners.length} / ${target} sorteados`;
   document.getElementById('raffle-status-label').textContent = done ? 'Sorteo completo' : winners.length > 0 ? 'En progreso...' : '';
-
-  // Button state
   const btn = document.getElementById('raffle-btn');
   if(btn){ btn.disabled = done; btn.style.opacity = done ? '0.38' : '1'; btn.style.pointerEvents = done ? 'none' : 'auto'; }
-
-  // Winner cards
   const el = document.getElementById('adm-winners-list');
   if(!winners.length){ el.innerHTML = ''; return; }
-
   const prizes = at.rafflePrizes || [];
   el.innerHTML = winners.map((seatNum, i) => {
-    const pos     = i + 1;
-    const prize   = prizes[i] || '';
-    const pass    = (at.passengers||{})[seatNum];
+    const pos = i + 1;
+    const prize = prizes[i] || '';
+    const pass  = (at.passengers||{})[seatNum];
     const posLabel = pos === 1 ? '1ro' : pos === 2 ? '2do' : pos === 3 ? '3ro' : `${pos}to`;
     const newBadge = i === winners.length - 1 && !done ? '<span style="font-size:9px;background:var(--accent);color:#000;border-radius:5px;padding:1px 6px;margin-left:5px;font-weight:700">NUEVO</span>' : '';
     return `
@@ -1398,17 +1810,378 @@ function notifyWinner(seatNum, prizeIndex){
   window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-function syncRaffleBtn(at){ syncRaffleUI(at); } // alias kept for compatibility
+function syncRaffleBtn(at){ syncRaffleUI(at); }
 
 function clearRaffle(){
   const at = getActive(); if(!at) return;
   at.winners = []; at.raffleTarget = null;
   save();
+  requestAnimationFrame(() => { renderPublic(); syncRaffleUI(at); toast('Sorteo restablecido'); });
+}
+
+// ===== SOLO RAFFLES ADMIN =====
+function renderSoloRaffleList() {
+  const el = document.getElementById('sr-list');
+  const raffles = S.soloRaffles || [];
+  if(!raffles.length){ el.innerHTML='<p style="font-size:11px;color:var(--muted);text-align:center;padding:14px">Sin sorteos independientes creados.</p>'; return; }
+  el.innerHTML = raffles.map(sr => {
+    const total = sr.totalTickets || 100;
+    const taken = Object.keys(sr.tickets||{}).length;
+    const winners = (sr.winners||[]).length;
+    return `
+    <div class="sraffle-item ${sr.active?'sr-active':''}">
+      <div>
+        <div class="sri-name">${sr.name}</div>
+        <div class="sri-meta">
+          ${sr.active?`<span style="color:var(--accent3)"><i class="fas fa-circle" style="font-size:7px"></i> Activo &bull; </span>`:`<span style="color:var(--muted)"><i class="fas fa-circle" style="font-size:7px"></i> Inactivo &bull; </span>`}
+          ${taken}/${total} tickets &bull; ${winners} ganador(es)
+        </div>
+      </div>
+      <div class="ti-acts">
+        <button class="btn btn-amber btn-sm" onclick="openSoloManage('${sr.id}')" style="margin-top:0"><i class="fas fa-gear"></i></button>
+        <button class="btn btn-ghost btn-sm" style="margin-top:0;color:var(--danger)" onclick="delSoloRaffle('${sr.id}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function newSoloRaffle() {
+  srEditId = null;
+  document.getElementById('sr-name').value = '';
+  document.getElementById('sr-desc').value = '';
+  document.getElementById('sr-prizes').value = '';
+  document.getElementById('sr-tickets').value = '100';
+  document.getElementById('sr-winners-n').value = '1';
+  document.getElementById('sr-price').value = '';
+  document.getElementById('sr-active').checked = true;
+  syncKnob('sr-active','sr-active-knob');
+  document.getElementById('sr-form-lbl').textContent = 'Nuevo Sorteo';
+  document.getElementById('sr-form-wrap').style.display = 'block';
+  document.getElementById('sr-manage-wrap').style.display = 'none';
+}
+
+function editSoloRaffle(id) {
+  const sr = (S.soloRaffles||[]).find(x=>x.id===id); if(!sr) return;
+  srEditId = id;
+  document.getElementById('sr-name').value = sr.name || '';
+  document.getElementById('sr-desc').value = sr.desc || '';
+  document.getElementById('sr-prizes').value = (sr.prizes||[]).join('\n');
+  document.getElementById('sr-tickets').value = sr.totalTickets || 100;
+  document.getElementById('sr-winners-n').value = sr.winnersTarget || 1;
+  document.getElementById('sr-price').value = sr.price || '';
+  document.getElementById('sr-active').checked = !!sr.active;
+  syncKnob('sr-active','sr-active-knob');
+  document.getElementById('sr-form-lbl').textContent = 'Editar Sorteo';
+  document.getElementById('sr-form-wrap').style.display = 'block';
+  document.getElementById('sr-manage-wrap').style.display = 'none';
+}
+
+function cancelSoloRaffleForm() {
+  document.getElementById('sr-form-wrap').style.display = 'none';
+  srEditId = null;
+  if(curSrId) { document.getElementById('sr-manage-wrap').style.display='block'; }
+}
+
+function saveSoloRaffle() {
+  const name = document.getElementById('sr-name').value.trim();
+  const desc = document.getElementById('sr-desc').value.trim();
+  const prizes = document.getElementById('sr-prizes').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+  const totalTickets = parseInt(document.getElementById('sr-tickets').value)||100;
+  const winnersTarget = parseInt(document.getElementById('sr-winners-n').value)||1;
+  const price = document.getElementById('sr-price').value.trim();
+  const active = document.getElementById('sr-active').checked;
+
+  if(!name){ toast('Ingresa un nombre para el sorteo','terr'); return; }
+  if(totalTickets < 1){ toast('Cantidad de tickets invalida','terr'); return; }
+
+  if(!S.soloRaffles) S.soloRaffles = [];
+
+  if(srEditId) {
+    const sr = S.soloRaffles.find(x=>x.id===srEditId);
+    if(sr) {
+      sr.name = name; sr.desc = desc; sr.prizes = prizes;
+      sr.totalTickets = totalTickets; sr.winnersTarget = winnersTarget;
+      sr.price = price; sr.active = active;
+    }
+  } else {
+    S.soloRaffles.push({
+      id: 'SR'+Date.now(), name, desc, prizes, totalTickets, winnersTarget,
+      price, active, tickets: {}, winners: [], winMethod: 'random', lotteryName: '', lotteryResult: ''
+    });
+  }
+
+  save();
+  document.getElementById('sr-form-wrap').style.display = 'none';
+  srEditId = null;
+  renderSoloRaffleList();
+  renderPublic();
+  if(curSrId) { document.getElementById('sr-manage-wrap').style.display='block'; renderSoloManage(curSrId); }
+  toast('Sorteo guardado');
+}
+
+function delSoloRaffle(id) {
+  if(!confirm('Eliminar este sorteo y todos sus datos?')) return;
+  S.soloRaffles = (S.soloRaffles||[]).filter(x=>x.id!==id);
+  if(curSrId === id) { curSrId = null; document.getElementById('sr-manage-wrap').style.display='none'; }
+  save(); renderSoloRaffleList(); renderPublic();
+  toast('Sorteo eliminado','twarn');
+}
+
+function openSoloManage(id) {
+  curSrId = id;
+  document.getElementById('sr-form-wrap').style.display = 'none';
+  document.getElementById('sr-manage-wrap').style.display = 'block';
+  setSrMethod('random', document.getElementById('sr-meth-rnd'));
+  renderSoloManage(id);
+}
+
+function cancelSoloManage() {
+  curSrId = null;
+  document.getElementById('sr-manage-wrap').style.display = 'none';
+}
+
+function renderSoloManage(id) {
+  const sr = (S.soloRaffles||[]).find(x=>x.id===id); if(!sr) return;
+  document.getElementById('sr-manage-name').textContent = sr.name;
+  document.getElementById('sr-manage-desc').textContent = sr.desc || '';
+
+  const tickets = sr.tickets || {};
+  const total = sr.totalTickets || 100;
+  const taken = Object.keys(tickets).length;
+  const paid = Object.values(tickets).filter(t=>t.paid).length;
+
+  document.getElementById('sr-stat-free').textContent = total - taken;
+  document.getElementById('sr-stat-taken').textContent = taken - paid;
+  document.getElementById('sr-stat-paid').textContent = paid;
+
+  // Ticket grid
+  const grid = document.getElementById('sr-ticket-grid');
+  grid.innerHTML = '';
+  for(let i=1; i<=total; i++){
+    const info = tickets[i];
+    const isWinner = (sr.winners||[]).includes(i);
+    const el = document.createElement('div');
+    el.className = 'tkt';
+    if(isWinner) el.classList.add('tkt-winner');
+    else if(info && info.paid) el.classList.add('tkt-paid');
+    else if(info) el.classList.add('tkt-taken');
+    el.innerHTML = `<span class="tkt-num">${i}</span>${info?`<span class="tkt-ini">${info.initials}</span>`:''}`;
+    el.onclick = () => admTicketClick(sr, i, info, isWinner);
+    grid.appendChild(el);
+  }
+
+  // Participants
+  renderSrParticipants(sr);
+
+  // Raffle UI
+  syncSoloRaffleUI(sr);
+}
+
+function admTicketClick(sr, num, info, isWinner) {
+  if(isWinner) { toast('Ticket ganador','twarn'); return; }
+  if(!info) { toast('Ticket #'+num+' libre','tinfo'); return; }
+  const wa = info.wa.replace(/\D/g,'');
+  const actions = `<div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap">
+    ${!info.paid?`<button class="btn btn-primary btn-sm" onclick="srConfirmPay('${sr.id}',${num});closeOv('ov-seat')" style="margin-top:0"><i class="fas fa-check"></i> Confirmar pago</button>`:`<span style="font-size:11px;color:var(--success)"><i class="fas fa-check-circle"></i> Pagado</span>`}
+    <button class="btn btn-wa btn-sm" onclick="srNotifyTicket('${sr.id}',${num})" style="margin-top:0"><i class="fab fa-whatsapp"></i> Notificar</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:0;color:var(--danger)" onclick="srFreeTicket('${sr.id}',${num});closeOv('ov-seat')"><i class="fas fa-trash"></i> Liberar</button>
+  </div>`;
+  document.getElementById('sv-form').style.display='none';
+  document.getElementById('sv-info').style.display='block';
+  document.getElementById('sm-title').textContent='Ticket #'+num;
+  document.getElementById('sm-sub').textContent=sr.name;
+  document.getElementById('si-id').textContent='Ticket #'+num;
+  document.getElementById('si-name').innerHTML=info.name+'<br><span style="font-size:11px;color:var(--muted)">'+info.wa+'</span>';
+  document.getElementById('si-wa').textContent='';
+  document.getElementById('si-status').innerHTML=`<span class="dot ${info.paid?'dp':'dw'}"></span>${info.paid?'Pago confirmado':'Apartado — pendiente de pago'}`;
+  // inject action buttons
+  const btnWrap = document.getElementById('si-status');
+  btnWrap.insertAdjacentHTML('afterend', actions);
+  openOv('ov-seat');
+}
+
+function srConfirmPay(srId, num) {
+  const sr = (S.soloRaffles||[]).find(x=>x.id===srId); if(!sr) return;
+  if(sr.tickets[num]) sr.tickets[num].paid = true;
+  save();
+  requestAnimationFrame(() => { renderSoloManage(srId); renderPublic(); toast('Ticket #'+num+' pago confirmado'); });
+}
+
+function srFreeTicket(srId, num) {
+  const sr = (S.soloRaffles||[]).find(x=>x.id===srId); if(!sr) return;
+  delete sr.tickets[num];
+  save();
+  requestAnimationFrame(() => { renderSoloManage(srId); renderPublic(); toast('Ticket #'+num+' liberado','twarn'); });
+}
+
+function srNotifyTicket(srId, num) {
+  const sr = (S.soloRaffles||[]).find(x=>x.id===srId); if(!sr) return;
+  const info = (sr.tickets||{})[num]; if(!info) return;
+  const wa = info.wa.replace(/\D/g,'');
+  const firstName = info.name.split(' ')[0];
+  const msg = `Hola ${firstName}, tu ticket *#${num}* para el sorteo *${sr.name}*${sr.price?' ya esta registrado. Por favor realiza tu pago de '+sr.price+' para confirmarlo.':' ha sido registrado exitosamente.'}\n\nEstaremos anunciando los resultados proximamente. Gracias por participar!`;
+  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function renderSrParticipants(sr) {
+  const el = document.getElementById('sr-participants-list');
+  const entries = Object.entries(sr.tickets||{}).sort((a,b)=>+a[0]-+b[0]);
+  if(!entries.length){ el.innerHTML='<p style="font-size:11px;color:var(--muted);text-align:center;padding:12px">Sin participantes aun.</p>'; return; }
+  el.innerHTML = entries.map(([num, p]) => `
+    <div class="pi">
+      <div class="pav">${p.initials}</div>
+      <div class="pin">
+        <div class="pin-name">${p.name}</div>
+        <div class="pin-meta"><span class="dot ${p.paid?'dp':'dw'}" style="margin-right:4px"></span>Ticket #${num}</div>
+        <div class="pin-meta">${p.wa}</div>
+      </div>
+      <div class="pa">
+        ${!p.paid?`<button class="pb2 ok" onclick="srConfirmPay('${sr.id}',${num})" title="Confirmar pago"><i class="fas fa-check"></i></button>`:`<button class="pb2" style="color:var(--success)" title="Pagado"><i class="fas fa-circle-check"></i></button>`}
+        <button class="pb2 wa2" onclick="srNotifyTicket('${sr.id}',${num})" title="Notificar"><i class="fab fa-whatsapp"></i></button>
+        <button class="pb2 del" onclick="srFreeTicket('${sr.id}',${num})" title="Liberar"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setSrMethod(method, btn) {
+  srMethod = method;
+  document.querySelectorAll('#sr-meth-rnd, #sr-meth-lot').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sr-lottery-cfg').style.display = method === 'lottery' ? 'block' : 'none';
+  document.getElementById('sr-random-cfg').style.display  = method === 'random'  ? 'block' : 'none';
+}
+
+function syncSoloRaffleUI(sr) {
+  if(!sr) return;
+  const target  = sr.winnersTarget || 1;
+  const winners = sr.winners || [];
+  const done    = winners.length >= target;
+  const pct     = target > 0 ? Math.round((winners.length / target) * 100) : 0;
+
+  document.getElementById('sr-raffle-progress').style.width = pct + '%';
+  document.getElementById('sr-raffle-step').textContent = `${winners.length} / ${target} sorteados`;
+  document.getElementById('sr-raffle-status').textContent = done ? 'Sorteo completo' : winners.length > 0 ? 'En progreso...' : '';
+
+  const btn = document.getElementById('sr-raffle-btn');
+  if(btn){ btn.disabled = done; btn.style.opacity = done ? '0.38' : '1'; btn.style.pointerEvents = done ? 'none' : 'auto'; }
+
+  const el = document.getElementById('sr-winners-list');
+  if(!winners.length){ el.innerHTML=''; return; }
+  const prizes = sr.prizes || [];
+  el.innerHTML = winners.map((tkNum, i) => {
+    const pos = i+1;
+    const posLabel = pos===1?'1ro':pos===2?'2do':pos===3?'3ro':`${pos}to`;
+    const prize = prizes[i]||'';
+    const info = (sr.tickets||{})[tkNum];
+    const newBadge = i === winners.length-1 && !done ? '<span style="font-size:9px;background:var(--accent3);color:#000;border-radius:5px;padding:1px 6px;margin-left:5px;font-weight:700">NUEVO</span>' : '';
+    return `<div class="winner-card">
+      <div class="wc-top">
+        <div class="wc-pos">${posLabel}</div>
+        <div>
+          <div class="wc-seat">Ticket #${tkNum}${newBadge}</div>
+          <div class="wc-owner">${info ? info.initials+' &bull; '+info.wa : '<i style="color:var(--accent3)">Sin registro</i>'}</div>
+        </div>
+      </div>
+      ${prize?`<div class="wc-prize"><i class="fas fa-gift"></i>${prize}</div>`:''}
+      <div class="wc-actions">
+        ${info
+          ? `<button class="wc-btn wc-btn-wa" onclick="notifySoloWinner('${sr.id}',${tkNum},${i})"><i class="fab fa-whatsapp"></i> Notificar ganador</button>`
+          : `<div class="wc-btn-no-reg"><i class="fas fa-user-slash"></i> Sin contacto</div>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function doSoloRaffle() {
+  const sr = (S.soloRaffles||[]).find(x=>x.id===curSrId);
+  if(!sr){ toast('No hay sorteo seleccionado','terr'); return; }
+
+  const target  = sr.winnersTarget || 1;
+  const current = sr.winners || [];
+  if(current.length >= target){ toast(`Sorteo completo. Usa Restablecer para nuevo sorteo.`,'twarn'); return; }
+
+  // Pool: all ticket numbers that aren't already winners
+  const total = sr.totalTickets || 100;
+  const free = [];
+  for(let i=1; i<=total; i++){
+    if(!current.includes(i)) free.push(i);
+  }
+  if(!free.length){ toast('No quedan tickets disponibles','terr'); return; }
+
+  const newWinner = free[Math.floor(Math.random() * free.length)];
+  sr.winners = [...current, newWinner];
+  save();
   requestAnimationFrame(() => {
-    renderPublic();
-    syncRaffleUI(at);
-    toast('Sorteo restablecido');
+    renderSoloManage(curSrId); renderPublic();
+    const step = sr.winners.length;
+    if(step >= target) toast(`Sorteo completo — ${target} ganador(es)!`,'tok');
+    else toast(`Ganador ${step} de ${target}: Ticket #${newWinner}`,'tinfo');
   });
+}
+
+function doLotteryRaffle() {
+  const sr = (S.soloRaffles||[]).find(x=>x.id===curSrId);
+  if(!sr){ toast('No hay sorteo seleccionado','terr'); return; }
+
+  const lotName   = document.getElementById('sr-lot-name').value;
+  const resultRaw = document.getElementById('sr-lot-result').value.trim();
+  const rule      = document.getElementById('sr-lot-rule').value;
+
+  if(!resultRaw){ toast('Ingresa el numero(s) de la loteria','terr'); return; }
+
+  const resultNums = resultRaw.split(/[,\s]+/).map(s=>s.trim()).filter(Boolean);
+  const total = sr.totalTickets || 100;
+  const current = sr.winners || [];
+
+  const matched = [];
+  for(let i=1; i<=total; i++){
+    if(current.includes(i)) continue;
+    const tkStr = String(i).padStart(4,'0');
+    for(const rn of resultNums){
+      const rnPad = rn.padStart(4,'0');
+      let hit = false;
+      if(rule==='exact') hit = tkStr === rnPad || String(i) === rn;
+      else if(rule==='last2') hit = tkStr.slice(-2) === rnPad.slice(-2);
+      else if(rule==='last3') hit = tkStr.slice(-3) === rnPad.slice(-3);
+      else if(rule==='first2') hit = tkStr.slice(0,2) === rnPad.slice(0,2);
+      if(hit){ matched.push(i); break; }
+    }
+  }
+
+  if(!matched.length){ toast('Ningun ticket coincidio con el resultado','twarn'); return; }
+
+  sr.winners = [...current, ...matched];
+  sr.lotteryName = lotName;
+  sr.lotteryResult = resultRaw;
+  sr.winMethod = 'lottery';
+  save();
+  requestAnimationFrame(() => {
+    renderSoloManage(curSrId); renderPublic();
+    toast(`${matched.length} ticket(s) ganador(es) — ${lotName}`,'tok');
+  });
+}
+
+function clearSoloRaffle() {
+  const sr = (S.soloRaffles||[]).find(x=>x.id===curSrId);
+  if(!sr) return;
+  sr.winners = [];
+  save();
+  requestAnimationFrame(() => { renderSoloManage(curSrId); renderPublic(); toast('Sorteo restablecido'); });
+}
+
+function notifySoloWinner(srId, tkNum, prizeIdx) {
+  const sr = (S.soloRaffles||[]).find(x=>x.id===srId); if(!sr) return;
+  const info = (sr.tickets||{})[tkNum]; if(!info) return;
+  const wa = info.wa.replace(/\D/g,'');
+  const prize = (sr.prizes||[])[prizeIdx] || '';
+  const pos = prizeIdx+1;
+  const posLabel = pos===1?'primer':pos===2?'segundo':pos===3?'tercer':`${pos}er`;
+  const prizeStr = prize ? `\nTu premio: *${prize}*` : '';
+  const lotInfo = sr.winMethod==='lottery' && sr.lotteryName ? `\nResultado: *${sr.lotteryName}* — ${sr.lotteryResult}` : '';
+  const msg = `Hola ${info.name.split(' ')[0]}, felicitaciones! Tu ticket *#${tkNum}* resulto ganador del ${posLabel} lugar en el sorteo *${sr.name}*.${prizeStr}${lotInfo}\n\nNos pondremos en contacto para coordinar la entrega del premio. Gracias por participar!`;
+  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 // ===== TOAST =====
